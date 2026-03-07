@@ -1,0 +1,56 @@
+---
+const { services } = Astro.props;
+import { Ship, Plane, FileText, Home, Package, Truck } from 'lucide-react';
+
+// Map the icon strings from Sanity to Lucide Components
+const iconMap = {
+  ship: Ship,
+  plane: Plane,
+  'file-text': FileText,
+  home: Home,
+  package: Package,
+  truck: Truck
+};
+---
+
+<section class="py-20 bg-white">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-extrabold text-slate-900 mb-4">Our Specialized Services</h2>
+      <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+        From secure document handling to full household relocation, we provide tailored logistics solutions from Dubai to all of Pakistan.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {services.map((service) => {
+        const IconComponent = iconMap[service.icon] || Package;
+        return (
+          <div class="group p-8 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-blue-600 hover:shadow-2xl transition-all duration-300">
+            <div class="mb-6 inline-block p-3 bg-blue-100 text-blue-600 rounded-xl group-hover:bg-white/20 group-hover:text-white">
+              <IconComponent size={32} />
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-white">
+              {service.title}
+            </h3>
+            
+            <p class="text-slate-600 mb-6 line-clamp-3 group-hover:text-blue-50">
+              {service.description}
+            </p>
+            
+            <a 
+              href={`/services/${service.slug.current}`} 
+              class="inline-flex items-center font-bold text-blue-600 group-hover:text-white"
+            >
+              Learn More 
+              <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        )
+      })}
+    </div>
+  </div>
+</section>

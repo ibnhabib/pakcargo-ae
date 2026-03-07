@@ -3,6 +3,8 @@ import sanity from '@sanity/astro';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 
+import netlify from '@astrojs/netlify';
+
 export default defineConfig({
   integrations: [
     sanity({
@@ -16,4 +18,6 @@ export default defineConfig({
       configFile: 'tailwind.config.mjs',
     }),
   ],
+
+  adapter: netlify(),
 });
