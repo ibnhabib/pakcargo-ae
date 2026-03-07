@@ -1,0 +1,35 @@
+---
+import '../styles/global.css';
+import { sanityClient } from "sanity:client";
+import PriceGrid from "../components/PriceGrid.astro";
+
+// 1. Fetch data from the new 'rateCard' schema and name it 'rates'
+const rates = await sanityClient.fetch(`*[_type == "rateCard"] | order(pricePerKg asc)`);
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>PakCargo.ae | Dubai to Pakistan Cargo</title>
+	</head>
+	<body class="bg-slate-50 min-h-screen font-sans">
+		<header class="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 px-6 shadow-md text-center">
+			<div class="max-w-4xl mx-auto">
+				<h1 class="text-5xl font-extrabold tracking-tight mb-2">PakCargo.ae</h1>
+				<div class="h-1 w-20 bg-yellow-400 mx-auto mb-4"></div>
+				<p class="text-xl text-blue-100 font-medium">Reliable & Honest Shipping to Pakistan</p>
+			</div>
+		</header>
+
+		<main class="py-10">
+			<PriceGrid rates={rates} />
+		</main>
+
+		<footer class="bg-slate-900 text-slate-400 py-10 text-center border-t border-slate-800 mt-20">
+			<p class="text-sm uppercase tracking-widest">&copy; 2026 PakCargo.ae | Pakistan Cargo Services</p>
+		</footer>
+	</body>
+</html>
