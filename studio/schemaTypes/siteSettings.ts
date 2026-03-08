@@ -17,7 +17,7 @@ export default defineType({
       type: 'string',
       group: 'seo',
       description: 'The main title for Google (e.g., Best Cargo to Pakistan | PakCargo.ae)',
-      validation: (Rule) => Rule.required().max(60),
+      validation: (Rule) => Rule.required().max(160),
     }),
     defineField({
       name: 'description',
