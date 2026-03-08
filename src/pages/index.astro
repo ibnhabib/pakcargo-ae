@@ -45,13 +45,13 @@ const businessSchema = {
       "image": settings?.ogImage ? urlFor(settings.ogImage).width(1200).url() : "https://pakcargo.ae/og-image.jpg",
       "telephone": settings?.phone || "+971XXXXXXXXX",
       "priceRange": "AED",
-      "description": "Professional door-to-door cargo to Pakistan. We provide free home pickup across Dubai, Abu Dhabi, and Sharjah. Secure air and sea freight experts.",
+      "description": "Professional door-to-door cargo to Pakistan from UAE. We provide free home pickup across Dubai, Abu Dhabi, and Sharjah. Specialists in cheap sea freight and fast air cargo services.",
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Dubai",
         "addressRegion": "Dubai",
         "addressCountry": "AE"
-        // Street address removed to operate as a Service-Area Business (SAB)
+        // Operating as a Service-Area Business (SAB): Street address is hidden to prevent unwanted walk-ins
       },
       "geo": {
         "@type": "GeoCoordinates",
@@ -67,13 +67,36 @@ const businessSchema = {
         }
       ],
       "knowsAbout": [
-        "pakistan cargo", 
-        "pak cargo", 
-        "cargo to pakistan", 
-        "air cargo to pakistan", 
-        "cargo dubai to pakistan", 
+       {
+    "@type": "Thing",
+    "name": "Freight Forwarding",
+    "sameAs": "https://en.wikipedia.org/wiki/Freight_forwarding"
+  },
+  {
+    "@type": "Thing",
+    "name": "Logistics in Dubai",
+    "sameAs": "https://en.wikipedia.org/wiki/Transport_in_Dubai"
+  },
+  {
+    "@type": "Thing",
+    "name": "Shipping to Pakistan",
+    "sameAs": "https://en.wikipedia.org/wiki/Pakistan%E2%80%93United_Arab_Emirates_relations"
+  },
+  {
+    "@type": "Thing",
+    "name": "Jebel Ali Port",
+    "sameAs": "https://en.wikipedia.org/wiki/Jebel_Ali_Port"
+  },
+        "pakistan cargo",
+        "pak cargo",
+        "cargo to pakistan",
+        "air cargo to pakistan",
+        "cargo dubai to pakistan",
+        "pak cargo service",
+        "pakistan cargo dubai",
+        "pak cargo near me",
         "door to door cargo pickup",
-        "free home pickup dubai"
+        "cheap cargo rates to pakistan",
       ],
       "areaServed": [
         { "@type": "City", "name": "Dubai" },
@@ -92,7 +115,6 @@ const businessSchema = {
       "url": "https://pakcargo.ae",
       "logo": "https://pakcargo.ae/favicon.svg",
       "contactPoint": {
-        "@type": "ContactPoint",
         "@type": "ContactPoint",
         "telephone": settings?.phone || "+971XXXXXXXXX",
         "contactType": "customer service",
