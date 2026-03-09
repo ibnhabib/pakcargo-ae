@@ -2,9 +2,9 @@
 import { sanityClient } from "sanity:client";
 import { urlFor } from "../lib/sanity";
 
-// Fetch the 3 most recent blog posts
+// Fetch blogs ordered by manual 'order' first, then by 'publishedAt' date
 const posts = await sanityClient.fetch(`
-  *[_type == "post"] | order(publishedAt desc)[0...3] {
+  *[_type == "post"] | order(order asc, publishedAt desc)[0...3] {
     title,
     slug,
     mainImage,
@@ -34,11 +34,13 @@ const posts = await sanityClient.fetch(`
       {posts.map((post) => (
         <article class="group relative flex flex-col bg-slate-50 rounded-[2rem] p-4 border border-transparent hover:border-blue-100 hover:bg-white hover:shadow-2xl transition-all duration-500">
           <div class="aspect-[4/3] rounded-2xl overflow-hidden mb-6">
-            <img 
-              src={urlFor(post.mainImage).width(600).height(450).url()} 
-              alt={post.mainImage.alt}
-              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-            />
+            {post.mainImage && (
+              <img 
+                src={urlFor(post.mainImage).width(600).height(450).url()} 
+                alt={post.mainImage.alt || post.title}
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              />
+            )}
           </div>
 
           <div class="px-4 pb-4 flex flex-col flex-grow">
