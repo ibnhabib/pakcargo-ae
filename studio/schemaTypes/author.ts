@@ -1,4 +1,4 @@
-import { defineField, defineType } from 'sanity'
+import {defineField, defineType} from 'sanity'
 
 export default defineType({
   name: 'author',
@@ -13,21 +13,60 @@ export default defineType({
     }),
     defineField({
       name: 'role',
-      title: 'Title/Role',
+      title: 'Professional Title',
       type: 'string',
-      description: 'e.g., Head of Operations at PakCargo.ae',
+      description: 'e.g., Senior Operations Manager or Logistics Strategist.',
+      initialValue: 'Logistics Expert',
     }),
     defineField({
       name: 'image',
-      title: 'Author Photo',
+      title: 'Professional Photo',
       type: 'image',
-      options: { hotspot: true },
+      options: {hotspot: true},
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alt Text',
+        },
+      ],
+    }),
+    defineField({
+      name: 'experienceYears',
+      title: 'Years of Experience',
+      type: 'number',
+      description: 'The number of years you have worked in the UAE-Pakistan cargo industry.',
     }),
     defineField({
       name: 'bio',
-      title: 'Professional Bio',
+      title: 'Expert Biography (E-E-A-T)',
       type: 'text',
-      description: 'Highlight years of experience in UAE-Pakistan logistics to build trust.',
+      description:
+        'Crucial: Mention your specific knowledge of Jebel Ali operations, Pakistan Customs (FBR), and door-to-door logistics.',
+    }),
+    defineField({
+      name: 'socialProfiles',
+      title: 'Social Media / Professional Links',
+      type: 'array',
+      of: [{type: 'url'}],
+      description: 'Link to your LinkedIn or professional profile if available to verify identity.',
+    }),
+    defineField({
+      name: 'expertise',
+      title: 'Specific Areas of Expertise',
+      type: 'array',
+      of: [{type: 'string'}],
+      description: 'e.g., "Customs Clearance", "Sea Freight", "Household Relocation".',
+      options: {
+        layout: 'tags',
+      },
     }),
   ],
+  preview: {
+    select: {
+      title: 'name',
+      subtitle: 'role',
+      media: 'image',
+    },
+  },
 })

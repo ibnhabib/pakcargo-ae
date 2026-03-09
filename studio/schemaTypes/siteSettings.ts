@@ -1,13 +1,14 @@
-import { defineField, defineType } from 'sanity'
+import {defineField, defineType} from 'sanity'
 
 export default defineType({
   name: 'siteSettings',
   title: 'Site Settings',
   type: 'document',
   groups: [
-    { name: 'seo', title: 'SEO & Meta Data' },
-    { name: 'contact', title: 'Global Contact & CTA' },
-    { name: 'business', title: 'Business Identity' },
+    {name: 'seo', title: 'SEO & Meta Data'},
+    {name: 'contact', title: 'Global Contact & CTA'},
+    {name: 'business', title: 'Business Identity'},
+    {name: 'verification', title: 'Trust & Verification'},
   ],
   fields: [
     // --- SEO GROUP ---
@@ -16,7 +17,8 @@ export default defineType({
       title: 'Global Site Title',
       type: 'string',
       group: 'seo',
-      description: 'The main title for Google (50-60 characters recommended).',
+      description:
+        'The main title for Google (e.g., PakCargo.ae | Best Pakistan Cargo Service from UAE).',
       validation: (Rule) => Rule.required().max(60),
     }),
     defineField({
@@ -32,8 +34,9 @@ export default defineType({
       title: 'Core Business Keywords',
       type: 'array',
       group: 'seo',
-      description: 'These populate the Schema "knowsAbout" field. Add your locked keywords here.',
-      of: [{ type: 'string' }],
+      description:
+        'CRITICAL: Add the 10 keywords you listed here. These populate the Schema "knowsAbout" field.',
+      of: [{type: 'string'}],
     }),
     defineField({
       name: 'ogImage',
@@ -43,7 +46,7 @@ export default defineType({
       description: 'Image shown on WhatsApp/Facebook (1200x630px).',
     }),
 
-    // --- BUSINESS IDENTITY GROUP (For Schema.org) ---
+    // --- BUSINESS IDENTITY GROUP ---
     defineField({
       name: 'businessName',
       title: 'Official Business Name',
@@ -52,73 +55,95 @@ export default defineType({
       initialValue: 'PakCargo.ae',
     }),
     defineField({
-      name: 'address',
-      title: 'Office/Warehouse Address',
+      name: 'legalName',
+      title: 'Legal Company Name',
       type: 'string',
       group: 'business',
-      description: 'Physical location for Local SEO trust.',
+      description: 'As it appears on your UAE Trade License.',
     }),
     defineField({
-      name: 'phone',
-      title: 'Business Phone',
+      name: 'address',
+      title: 'Warehouse/Office Address',
       type: 'string',
       group: 'business',
-      description: 'Primary contact for schema (e.g., +971 50 123 4567).',
+      description: 'Full physical address (e.g., Jebel Ali Freezone, Warehouse X, Dubai).',
+    }),
+    defineField({
+      name: 'geoCoordinates',
+      title: 'Google Maps Geo-Coordinates',
+      type: 'object',
+      group: 'business',
+      description: 'Crucial for "Cargo Near Me" rankings.',
+      fields: [
+        {name: 'lat', title: 'Latitude', type: 'number'},
+        {name: 'lng', title: 'Longitude', type: 'number'},
+      ],
     }),
     defineField({
       name: 'mainServiceAreas',
       title: 'Main Service Regions',
       type: 'array',
       group: 'business',
-      description: 'Emirates you serve (e.g., Dubai, Abu Dhabi).',
-      of: [{ type: 'string' }],
+      description: 'The Emirates you serve.',
+      of: [{type: 'string'}],
       options: {
         list: [
-          { title: 'Dubai', value: 'Dubai' },
-          { title: 'Abu Dhabi', value: 'Abu Dhabi' },
-          { title: 'Sharjah', value: 'Sharjah' },
-          { title: 'Ajman', value: 'Ajman' },
-          { title: 'Al Ain', value: 'Al Ain' },
-          { title: 'Ras Al Khaimah', value: 'Ras Al Khaimah' },
-          { title: 'Fujairah', value: 'Fujairah' },
-          { title: 'Umm Al Quwain', value: 'Umm Al Quwain' },
-        ]
-      }
-    }),
-    defineField({
-      name: 'socialLinks',
-      title: 'Social Media Profiles (sameAs)',
-      type: 'array',
-      group: 'business',
-      description: 'Links to Facebook, Instagram, etc. to prove brand authority.',
-      of: [{ type: 'url' }],
-    }),
-
-    // --- EXISTING CONTACT & CTA GROUP ---
-    defineField({
-      name: 'announcementBar',
-      title: 'Announcement Bar (Global)',
-      type: 'string',
-      group: 'contact',
-    }),
-    defineField({
-      name: 'ctaType',
-      title: 'Global CTA Type',
-      type: 'string',
-      group: 'contact',
-      options: {
-        list: [
-          { title: 'WhatsApp', value: 'whatsapp' },
-          { title: 'Phone', value: 'phone' }
+          {title: 'Dubai', value: 'Dubai'},
+          {title: 'Abu Dhabi', value: 'Abu Dhabi'},
+          {title: 'Sharjah', value: 'Sharjah'},
+          {title: 'Ajman', value: 'Ajman'},
+          {title: 'Al Ain', value: 'Al Ain'},
+          {title: 'Ras Al Khaimah', value: 'Ras Al Khaimah'},
+          {title: 'Fujairah', value: 'Fujairah'},
+          {title: 'Umm Al Quwain', value: 'Umm Al Quwain'},
         ],
       },
     }),
+
+    // --- TRUST & VERIFICATION (The SEO Secret Sauce) ---
     defineField({
-      name: 'ctaValue',
-      title: 'CTA Contact Value',
+      name: 'tradeLicense',
+      title: 'UAE Trade License Number',
+      type: 'string',
+      group: 'verification',
+      description: 'Adding this proves legitimacy to search crawlers.',
+    }),
+    defineField({
+      name: 'openingHours',
+      title: 'Business Hours',
+      type: 'string',
+      group: 'verification',
+      description: 'e.g., Mo-Sa 09:00-21:00',
+      initialValue: 'Mo-Su 00:00-24:00', // 24/7 is common for cargo
+    }),
+    defineField({
+      name: 'socialLinks',
+      title: 'Social Media Profiles',
+      type: 'array',
+      group: 'verification',
+      of: [{type: 'url'}],
+    }),
+
+    // --- GLOBAL CONTACT & CTA ---
+    defineField({
+      name: 'phone',
+      title: 'Primary Phone',
       type: 'string',
       group: 'contact',
-      description: 'Enter phone number (e.g., 971501234567 for WhatsApp).'
+    }),
+    defineField({
+      name: 'whatsappNumber',
+      title: 'WhatsApp (For Direct Chat)',
+      type: 'string',
+      group: 'contact',
+      description: 'Number with country code, no "+" (e.g., 971501234567).',
+    }),
+    defineField({
+      name: 'announcementBar',
+      title: 'Global Announcement',
+      type: 'string',
+      group: 'contact',
+      description: 'e.g., "Special Ramadan Rates Now Live!"',
     }),
   ],
 })

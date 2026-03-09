@@ -10,22 +10,18 @@ export default defineType({
     {name: 'richSnippets', title: 'Rich Snippets (FAQ)'},
   ],
   fields: [
-    // --- NEW ORDER FIELD ---
     defineField({
       name: 'order',
       title: 'Display Priority',
       type: 'number',
       group: 'content',
-      description: 'Lower numbers appear first (e.g., 1 before 2). If empty, posts sort by date.',
       initialValue: 99,
     }),
-    // --- EXISTING FIELDS ---
     defineField({
       name: 'title',
       title: 'Post Title',
       type: 'string',
       group: 'content',
-      description: 'Use keywords like "Pakistan Cargo" or "Dubai Shipping Guide".',
     }),
     defineField({
       name: 'slug',
@@ -37,10 +33,25 @@ export default defineType({
     }),
     defineField({
       name: 'author',
-      title: 'Author',
+      title: 'Expert Author',
       type: 'reference',
       to: [{type: 'author'}],
       group: 'content',
+      validation: (Rule) => Rule.required(), // Essential for E-E-A-T
+    }),
+    defineField({
+      name: 'topic',
+      title: 'Primary Topic',
+      type: 'string',
+      group: 'content',
+      options: {
+        list: [
+          {title: 'Customs & Regulations', value: 'customs'},
+          {title: 'Packing & Safety', value: 'packing'},
+          {title: 'Shipping Rates & Tips', value: 'rates'},
+          {title: 'Company News', value: 'news'},
+        ],
+      },
     }),
     defineField({
       name: 'mainImage',
@@ -48,58 +59,27 @@ export default defineType({
       type: 'image',
       group: 'content',
       options: {hotspot: true},
-      fields: [
-        {
-          name: 'alt',
-          type: 'string',
-          title: 'Alternative Text',
-          description: 'Vital for SEO. Describe the image for Google.',
-          validation: (Rule) => Rule.required(),
-        },
-      ],
-    }),
-    defineField({
-      name: 'publishedAt',
-      title: 'Published Date',
-      type: 'datetime',
-      group: 'content',
-      initialValue: () => new Date().toISOString(),
+      fields: [{name: 'alt', type: 'string', title: 'Alt Text'}],
     }),
     defineField({
       name: 'body',
-      title: 'Post Body',
+      title: 'Post Content',
       type: 'array',
       group: 'content',
       of: [
         defineArrayMember({type: 'block'}),
         defineArrayMember({
           type: 'image',
-          options: {hotspot: true},
-          fields: [
-            {name: 'caption', type: 'string', title: 'Caption'},
-            {name: 'alt', type: 'string', title: 'Alt Text'},
-          ],
-        }),
-        defineArrayMember({
-          name: 'youtube',
-          type: 'object',
-          title: 'YouTube Embed',
-          fields: [
-            {
-              name: 'url',
-              type: 'url',
-              title: 'YouTube Video URL',
-            },
-          ],
+          fields: [{name: 'alt', type: 'string', title: 'Alt Text'}],
         }),
       ],
     }),
+    // SEO Group
     defineField({
       name: 'seoTitle',
-      title: 'SEO Meta Title',
+      title: 'SEO Title',
       type: 'string',
       group: 'seo',
-      validation: (Rule) => Rule.max(60),
     }),
     defineField({
       name: 'metaDescription',
@@ -107,53 +87,22 @@ export default defineType({
       type: 'text',
       group: 'seo',
       rows: 3,
-      validation: (Rule) => Rule.max(160),
     }),
-    defineField({
-      name: 'canonicalUrl',
-      title: 'Canonical URL',
-      type: 'url',
-      group: 'seo',
-    }),
-    defineField({
-      name: 'keywords',
-      title: 'Target Keywords',
-      type: 'array',
-      group: 'seo',
-      of: [{type: 'string'}],
-      options: {layout: 'tags'},
-    }),
+    // Rich Snippets
     defineField({
       name: 'faqs',
-      title: 'FAQ Section',
+      title: 'Post FAQs',
       type: 'array',
       group: 'richSnippets',
       of: [
         defineArrayMember({
           type: 'object',
-          name: 'faqItem',
           fields: [
-            {name: 'question', type: 'string', title: 'Question'},
-            {name: 'answer', type: 'text', title: 'Answer'},
+            {name: 'question', type: 'string'},
+            {name: 'answer', type: 'text'},
           ],
         }),
       ],
     }),
   ],
-  // Preview configuration to see the order in Sanity Studio
-  preview: {
-    select: {
-      title: 'title',
-      order: 'order',
-      date: 'publishedAt',
-      media: 'mainImage',
-    },
-    prepare({title, order, date, media}) {
-      return {
-        title: title,
-        subtitle: `Priority: ${order || 'N/A'} | Date: ${date ? date.split('T')[0] : 'No date'}`,
-        media: media,
-      }
-    },
-  },
 })

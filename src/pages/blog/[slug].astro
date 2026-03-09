@@ -3,8 +3,8 @@ import { sanityClient } from "sanity:client";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { urlFor } from "../../lib/sanity";
 import { PortableText } from "astro-portabletext";
+import { Clock, UserCheck, ShieldCheck } from 'lucide-react';
 
-// 1. Fetch all blog posts to generate the URLs
 export async function getStaticPaths() {
   const posts = await sanityClient.fetch(`*[_type == "post"]`);
   return posts.map((post) => ({
@@ -15,84 +15,91 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 
-// 2. Fetch Author and Site Settings for the CTA/Footer
-const author = await sanityClient.fetch(`*[_type == "author" && _id == $authorRef][0]`, { authorRef: post.author?._ref });
-const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+// Optimized Fetch: Get Author and Settings in one go
+const data = await sanityClient.fetch(`{
+  "author": *[_type == "author" && _id == $authorRef][0],
+  "settings": *[_type == "siteSettings"][0]
+}`, { authorRef: post.author?._ref });
 
-// 3. SEO FAQ Schema Logic
+const { author, settings } = data;
+
 const faqSchema = post.faqs ? {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": post.faqs.map(faq => ({
     "@type": "Question",
     "name": faq.question,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": faq.answer
-    }
+    "acceptedAnswer": { "@type": "Answer", "text": faq.answer }
   }))
 } : null;
 ---
 
-<BaseLayout 
-  title={post.seoTitle || post.title} 
-  description={post.metaDescription}
-  ogImage={post.mainImage}
->
-  <article class="max-w-4xl mx-auto px-6 py-20">
-    
-    <header class="mb-12 text-center">
-      <div class="flex items-center justify-center gap-2 text-blue-600 font-bold mb-4 uppercase tracking-widest text-sm">
-        <span>Logistics Guide</span>
-        <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-        <time>{new Date(post.publishedAt).toLocaleDateString('en-AE', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
+<BaseLayout title={post.seoTitle || post.title} description={post.metaDescription}>
+  <article class="max-w-5xl mx-auto px-6 py-12 md:py-24">
+    <header class="max-w-3xl mx-auto text-center mb-16">
+      <div class="flex items-center justify-center gap-4 text-blue-600 font-black uppercase tracking-tighter text-sm mb-6">
+        <span class="bg-blue-50 px-3 py-1 rounded-lg">{post.topic || 'Logistics'}</span>
+        <time>{new Date(post.publishedAt).toLocaleDateString('en-AE', { month: 'long', year: 'numeric' })}</time>
       </div>
-      <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 mb-8 tracking-tight">
+      <h1 class="text-5xl md:text-7xl font-black text-slate-900 mb-8 leading-[0.95] tracking-tight italic">
         {post.title}
       </h1>
-      
-      {post.mainImage && (
-        <img 
-          src={urlFor(post.mainImage).width(1200).height(600).url()} 
-          alt={post.mainImage.alt}
-          class="w-full h-auto rounded-3xl shadow-2xl mb-12 border border-slate-100"
-        />
-      )}
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-      
+    {post.mainImage && (
+      <div class="relative mb-20 group">
+        <div class="absolute inset-0 bg-blue-600 rounded-[3rem] rotate-1 scale-[1.02] opacity-10 group-hover:rotate-0 transition-transform"></div>
+        <img 
+          src={urlFor(post.mainImage).width(1400).url()} 
+          alt={post.mainImage.alt}
+          class="relative w-full aspect-video object-cover rounded-[3.5rem] shadow-2xl border-8 border-white"
+        />
+      </div>
+    )}
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
       <div class="lg:col-span-8">
-        <div class="prose prose-lg prose-slate max-w-none 
-          prose-headings:text-slate-900 prose-headings:font-bold
-          prose-a:text-blue-600 prose-strong:text-slate-900">
+        <div class="prose prose-xl prose-slate max-w-none prose-headings:italic prose-headings:font-black">
           <PortableText value={post.body} />
         </div>
 
+        {/* AUTHOR EXPERTISE BLOCK */}
         {author && (
-          <div class="mt-16 p-8 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row items-center gap-6">
-            {author.image && (
-              <img src={urlFor(author.image).width(200).url()} class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" alt={author.name} />
-            )}
-            <div>
-              <p class="text-sm font-bold text-blue-600 uppercase mb-1">Expert Contributor</p>
-              <h3 class="text-xl font-bold text-slate-900 mb-2">{author.name}</h3>
-              <p class="text-slate-600 text-sm leading-relaxed">{author.bio}</p>
+          <div class="mt-24 p-12 bg-slate-900 rounded-[3rem] text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-8 opacity-10"><UserCheck size={120} /></div>
+            <div class="relative z-10 flex flex-col md:flex-row gap-8 items-center md:items-start">
+              {author.image && (
+                <img src={urlFor(author.image).width(200).url()} class="w-32 h-32 rounded-3xl object-cover border-4 border-blue-500 shadow-xl" alt={author.name} />
+              )}
+              <div>
+                <span class="inline-flex items-center gap-2 text-blue-400 font-bold uppercase tracking-widest text-xs mb-2">
+                  <ShieldCheck size={14} /> Verified Logistics Expert
+                </span>
+                <h3 class="text-3xl font-black mb-4 italic">{author.name}</h3>
+                <p class="text-slate-400 leading-relaxed mb-6">{author.bio}</p>
+                <div class="flex flex-wrap gap-2">
+                  {author.expertise?.map((tag) => (
+                    <span class="px-3 py-1 bg-white/10 rounded-full text-xs font-bold text-blue-300">{tag}</span>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      <aside class="lg:col-span-4 space-y-8">
-        <div class="sticky top-8 bg-slate-900 rounded-3xl p-8 text-white">
-          <h3 class="text-2xl font-bold mb-4 leading-tight">Ship to Pakistan Today</h3>
-          <p class="text-slate-400 mb-8">Get the best rates for Pak Cargo door-to-door delivery from Dubai.</p>
-          <a href={`https://wa.me/${settings?.ctaValue}`} class="block w-full text-center py-4 bg-green-600 hover:bg-green-700 font-bold rounded-xl transition-all mb-4">
-            WhatsApp Quote
-          </a>
-          <a href={`tel:${settings?.phone}`} class="block w-full text-center py-4 border border-slate-700 hover:bg-slate-800 font-bold rounded-xl transition-all">
-            Call Logistics Expert
-          </a>
+      <aside class="lg:col-span-4 sticky top-12 h-fit">
+        <div class="p-8 bg-blue-600 rounded-[2.5rem] text-white shadow-2xl shadow-blue-900/40">
+          <h3 class="text-2xl font-black mb-4 leading-tight">Need a Quote?</h3>
+          <p class="text-blue-100 mb-8 font-medium">Get direct rates from Dubai to any city in Pakistan.</p>
+          <div class="space-y-4">
+            <a href={`https://wa.me/${settings?.ctaValue}`} class="flex items-center justify-center gap-3 py-5 bg-white text-blue-600 font-black rounded-2xl hover:scale-105 transition-transform">
+              WhatsApp Us
+            </a>
+            <a href={`tel:${settings?.phone}`} class="flex items-center justify-center gap-3 py-5 bg-blue-700 text-white font-black rounded-2xl hover:bg-blue-800 transition-colors">
+              Call Specialist
+            </a>
+          </div>
         </div>
       </aside>
     </div>
