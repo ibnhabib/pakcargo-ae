@@ -1,6 +1,7 @@
 ---
 import { sanityClient } from "sanity:client";
 import { MapPin, Mail, Phone, Ship } from 'lucide-react';
+import Logo from './Logo.astro';
 
 const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
 const services = await sanityClient.fetch(`*[_type == "service"] | order(title asc)`);
@@ -10,11 +11,11 @@ const serviceAreas = settings?.mainServiceAreas || [];
 <footer class="bg-slate-950 text-slate-400 pt-20 pb-10 border-t border-white/5">
   <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
     
-    <div class="space-y-6">
-      <div class="flex items-center gap-2">
-        <Ship class="text-blue-500" size={25} />
-        <span class="text-2xl font-black text-white tracking-tighter">PakCargo<span class="text-blue-600">.ae</span></span>
+   <div class="space-y-6">
+      <!-- logo start -->
+      <div class="brightness-0 invert"> <Logo />
       </div>
+      <!-- logo finish -->
       <p class="text-sm leading-relaxed">
         The UAE's most trusted partner for door-to-door cargo to Pakistan. Moving your items with safety and speed since 2026.
       </p>
