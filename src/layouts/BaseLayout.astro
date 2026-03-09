@@ -4,7 +4,7 @@ import { sanityClient } from "sanity:client";
 import { urlFor } from "../lib/sanity";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import FloatingActions from "../components/FloatingActions.astro"; // 1. Added Import
+import FloatingActions from "../components/FloatingActions.astro";
 
 interface Props {
   title?: string;
@@ -23,7 +23,7 @@ const finalDesc = description || settings?.description || "Reliable cargo and co
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     
     <title>{finalTitle}</title>
@@ -34,14 +34,15 @@ const finalDesc = description || settings?.description || "Reliable cargo and co
     <meta property="og:description" content={finalDesc} />
     {ogImage && <meta property="og:image" content={urlFor(ogImage).width(1200).url()} />}
   </head>
-  <body class="bg-slate-50 min-h-screen font-sans flex flex-col antialiased">
+  <body class="bg-white min-h-screen font-sans antialiased overflow-x-hidden flex flex-col">
     <Header />
-    <div class="flex-grow flex flex-col gap-y-20">
+    
+    <main class="flex-grow">
       <slot />
-    </div>
+    </main>
+
     <Footer />
 
-    {/* 2. Added FloatingActions component here */}
     <FloatingActions />
   </body>
 </html>

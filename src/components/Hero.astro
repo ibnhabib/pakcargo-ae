@@ -5,11 +5,11 @@ import { ShieldCheck, Truck, Clock, Phone, MessageSquare } from 'lucide-react';
 const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
 ---
 
-<section class="relative bg-white pt-10 md:pt-16 pb-12 overflow-hidden">
+<section class="relative bg-white pt-10 md:pt-16 pb-12 overflow-hidden w-full">
   <div class="max-w-7xl mx-auto px-6 lg:px-8">
     <div class="grid lg:grid-cols-2 gap-12 items-center">
       
-      <div class="text-left">
+      <div class="text-left z-10">
         <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 leading-tight mb-6">
           Reliable <span class="text-blue-600">Door-to-Door</span> Cargo from Dubai to Pakistan
         </h1>
@@ -37,7 +37,39 @@ const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
         </div>
       </div>
 
-      <div class="relative">
-        <div class="rounded-3xl overflow-hidden shadow-2xl border-8 border-slate-50">
+      <div class="relative w-full">
+        <div class="rounded-3xl overflow-hidden shadow-2xl border-8 border-slate-50 bg-slate-100 aspect-video lg:aspect-square">
           <img 
-            src="
+            src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800" 
+            alt="Logistics and Cargo Service"
+            class="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-slate-100 pt-10">
+      <div class="flex items-center gap-4 text-slate-700">
+        <ShieldCheck class="text-blue-600" size={32} />
+        <div>
+          <p class="font-bold">100% Secure</p>
+          <p class="text-sm text-slate-500">Fully insured</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-slate-700">
+        <Truck class="text-blue-600" size={32} />
+        <div>
+          <p class="font-bold">Door Delivery</p>
+          <p class="text-sm text-slate-500">Every city in Pakistan</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-slate-700">
+        <Clock class="text-blue-600" size={32} />
+        <div>
+          <p class="font-bold">Fast Tracking</p>
+          <p class="text-sm text-slate-500">Real-time updates</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
