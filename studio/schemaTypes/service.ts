@@ -5,6 +5,7 @@ export default {
   groups: [
     { name: 'content', title: 'Main Content' },
     { name: 'seo', title: 'SEO & Search' },
+    { name: 'local', title: 'Local Targeting' },
   ],
   fields: [
     {
@@ -34,18 +35,48 @@ export default {
       }
     },
     {
+      name: 'mainImage',
+      title: 'Service Cover Image',
+      type: 'image',
+      group: 'content',
+      options: { hotspot: true },
+      description: 'Upload a high-quality photo of the shipping method (1200x600px).',
+    },
+    {
       name: 'icon',
       title: 'Icon Type',
       type: 'string',
       group: 'content',
-      description: 'Use: ship, plane, truck, package, file-text',
+      description: 'Use: ship, plane, truck, package, home',
+    },
+    {
+      name: 'serviceType',
+      title: 'Schema Service Category',
+      type: 'string',
+      group: 'seo',
+      description: 'Helps Google categorize: MovingCompany, DeliveryService, or FreightTransportService',
+      options: {
+        list: [
+          { title: 'Sea Freight', value: 'SeaFreight' },
+          { title: 'Air Freight', value: 'AirFreight' },
+          { title: 'Moving & Relocation', value: 'MovingCompany' },
+          { title: 'General Cargo', value: 'DeliveryService' },
+        ]
+      }
+    },
+    {
+      name: 'startingPrice',
+      title: 'Starting Price (AED)',
+      type: 'string',
+      group: 'content',
+      description: 'e.g., "1.50" or "500". Used for Price Schema.',
     },
     {
       name: 'description',
       title: 'Homepage Summary',
       type: 'text',
       group: 'content',
-      description: 'The brief summary that appears on the homepage cards. Use keywords like "pakistan cargo".'
+      description: 'The brief summary that appears on the homepage cards.'
     },
     {
       name: 'keyFeatures',
@@ -53,7 +84,15 @@ export default {
       type: 'array',
       group: 'content',
       of: [{ type: 'string' }],
-      description: 'List 3-4 features (e.g., "Door to door delivery", "Customs clearance included")',
+      description: 'List 3-4 features (e.g., "Door to door delivery", "Free home pickup")',
+    },
+    {
+      name: 'serviceableAreas',
+      title: 'Local Neighborhoods (Near Me Optimization)',
+      type: 'array',
+      group: 'local',
+      description: 'Type a locality and press Enter. e.g., "Deira, Dubai" or "Musaffah, Abu Dhabi".',
+      of: [{ type: 'string' }],
     },
     {
       name: 'metaDescription',
@@ -71,14 +110,12 @@ export default {
       of: [{type: 'block'}],
       description: 'Long-form content for the dedicated service page.',
     },
-    // --- NEW FAQ SECTION ADDED BELOW ---
     {
       name: 'faqs',
       title: 'GEO-Optimized FAQs',
       type: 'array',
       group: 'seo',
-      description: 'Add specific questions to capture Google AI Overviews and People Also Ask boxes.',
-      of: [{ type: 'faqItem' }], // This refers to the faqItem object you created
+      of: [{ type: 'faqItem' }],
     }
   ]
 }

@@ -8,141 +8,79 @@ import ServiceSection from "../components/ServiceSection.astro";
 import Hero from "../components/Hero.astro";
 import WhyChooseUs from "../components/WhyChooseUs.astro";
 import PartnerLogos from "../components/PartnerLogos.astro";
-import FaqSection from "../components/FaqSection.astro"; // Import the component
+import FaqSection from "../components/FaqSection.astro";
+import { MapPin } from 'lucide-react';
 
 // 1. Fetch data
 const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
-const services = await sanityClient.fetch(`*[_type == "service"] | order(_createdAt asc)`);
+const services = await sanityClient.fetch(`*[_type == "service"] | order(title asc)`);
 const rates = await sanityClient.fetch(`*[_type == "rateCard"] | order(pricePerKg asc)`);
 
-// Fetch Homepage Specific Data (Including your new FAQs)
 const homeData = await sanityClient.fetch(`*[_type == "homepage"][0]{
   ...,
   faqs[] {
     question,
     atomicAnswer,
     detailedAnswer,
-    lastReviewed,
-    targetEntity
+    lastReviewed
   }
 }`);
 
-// Fetch Partners
 const globalPartners = await sanityClient.fetch(`*[_type == "partner" && type == "global"]`);
 const localPartners = await sanityClient.fetch(`*[_type == "partner" && type == "local"]`);
 const trustData = await sanityClient.fetch(`*[_type == "trustPoints"][0]`);
 
-// 2. business Schema
+// 2. Dynamic Schema Logic
+const serviceAreas = settings?.mainServiceAreas || [
+  "Dubai", "Abu Dhabi", "Sharjah", "Ajman", 
+  "Ras Al Khaimah", "Al Ain", "Fujairah", "Umm Al Quwain"
+];
+
 const businessSchema = {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "LocalBusiness",
       "@id": "https://pakcargo.ae/#organization",
-      "name": "PakCargo.ae",
+      "name": settings?.businessName || "PakCargo.ae",
       "url": "https://pakcargo.ae",
       "logo": "https://pakcargo.ae/favicon.svg",
       "image": settings?.ogImage ? urlFor(settings.ogImage).width(1200).url() : "https://pakcargo.ae/og-image.jpg",
       "telephone": settings?.phone || "+971XXXXXXXXX",
       "priceRange": "AED",
-      "description": "Reliable door-to-door pak cargo services from UAE to Pakistan. Get cheap rates for sea and air cargo to Pakistan with free home pickup in Dubai, Abu Dhabi, and Sharjah. Professional pakistan cargo delivery to Karachi, Lahore, and all cities via TCS.",
+      "description": settings?.description,
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Dubai",
         "addressRegion": "Dubai",
         "addressCountry": "AE"
-        // Operating as a Service-Area Business (SAB): Street address is hidden to prevent unwanted walk-ins
       },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": "25.2048",
-        "longitude": "55.2708"
-      },
-      "openingHoursSpecification": [
-        {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-          "opens": "09:00",
-          "closes": "17:00"
-        }
-      ],
-      "knowsAbout": [
-       {
-    "@type": "Thing",
-    "name": "Freight Forwarding",
-    "sameAs": "https://en.wikipedia.org/wiki/Freight_forwarding"
-  },
-  {
-    "@type": "Thing",
-    "name": "Logistics in Dubai",
-    "sameAs": "https://en.wikipedia.org/wiki/Transport_in_Dubai"
-  },
-  {
-    "@type": "Thing",
-    "name": "Shipping to Pakistan",
-    "sameAs": "https://en.wikipedia.org/wiki/Pakistan%E2%80%93United_Arab_Emirates_relations"
-  },
-  {
-    "@type": "Thing",
-    "name": "Jebel Ali Port",
-    "sameAs": "https://en.wikipedia.org/wiki/Jebel_Ali_Port"
-  },
-        "pakistan cargo",
-        "pak cargo",
-        "cargo to pakistan",
-        "air cargo to pakistan",
-        "cargo dubai to pakistan",
-        "pak cargo service",
-        "pakistan cargo dubai",
-        "pak cargo near me",
-        "door to door cargo pickup",
-        "cheap cargo rates to pakistan",
-      ],
       "areaServed": [
-        { "@type": "City", "name": "Dubai" },
-        { "@type": "City", "name": "Abu Dhabi" },
-        { "@type": "City", "name": "Sharjah" },
-        { "@type": "City", "name": "Ajman" },
-        { "@type": "City", "name": "Al Ain" },
-        { "@type": "City", "name": "Ras Al Khaimah" },
+        ...serviceAreas.map(city => ({ "@type": "City", "name": city })),
         { "@type": "Country", "name": "Pakistan" }
+      ],
+      // This pulls directly from your 'Core Business Keywords' in Sanity
+      "knowsAbout": settings?.keywords || [
+        "pakistan cargo", "pak cargo", "cargo to pakistan", "air cargo to pakistan"
       ]
-    },
-    {
-      "@type": "Organization",
-      "@id": "https://pakcargo.ae/#organization",
-      "name": "PakCargo.ae",
-      "url": "https://pakcargo.ae",
-      "logo": "https://pakcargo.ae/favicon.svg",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": settings?.phone || "+971XXXXXXXXX",
-        "contactType": "customer service",
-        "areaServed": ["AE", "PK"],
-        "availableLanguage": ["English", "Urdu", "Hindi"]
-      }
     }
   ]
 };
 
-// 3. Dynamic FAQ Schema for AI Overviews
 const faqSchema = homeData?.faqs ? {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": homeData.faqs.map((faq) => ({
     "@type": "Question",
     "name": faq.question,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": faq.atomicAnswer
-    }
+    "acceptedAnswer": { "@type": "Answer", "text": faq.atomicAnswer }
   }))
 } : null;
 ---
 
 <BaseLayout 
-  title={settings?.title || "Pakistan Cargo from Dubai | Best Pak Cargo Service - PakCargo.ae"}
-  description={settings?.description || "Leading pakistan cargo service from Dubai. We offer air and sea pak cargo to pakistan with secure door-to-door delivery."}
+  title={settings?.title || "Pakistan Cargo from UAE | Sea & Air Pak Cargo Service - PakCargo.ae"}
+  description={settings?.description}
 >
   <script type="application/ld+json" set:html={JSON.stringify(businessSchema)} />
   {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
@@ -153,43 +91,77 @@ const faqSchema = homeData?.faqs ? {
     <ServiceSection services={services} />
     
     <PartnerLogos globalPartners={globalPartners} localPartners={localPartners} />
-    
     {trustData && <WhyChooseUs data={trustData} />}
 
-    <section id="rates" class="py-10">
-      <PriceGrid rates={rates} />
+    <section id="rates" class="py-20 bg-white border-t border-slate-50">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <h2 class="text-4xl font-black text-slate-900 mb-4 italic">Competitive Shipping Rates</h2>
+        <p class="text-slate-600 text-lg mb-12">Updated <strong>pak cargo</strong> pricing for 2026 shipments.</p>
+        <PriceGrid rates={rates} />
+      </div>
+    </section>
+
+    <section class="py-24 bg-slate-50 border-y border-slate-100">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-16 gap-8 text-center md:text-left">
+          <div class="max-w-2xl">
+            <h2 class="text-3xl md:text-6xl font-black text-slate-900 mb-6 leading-tight italic">
+              Door-to-Door Pickup <br/>Across the <span class="text-blue-600 text-nowrap underline decoration-blue-200 underline-offset-8">Entire UAE</span>
+            </h2>
+            <p class="text-xl text-slate-600 leading-relaxed">
+              We provide professional <strong>pakistan cargo</strong> solutions with free home pickup service from every Emirate. Our logistics network is built for speed and safety.
+            </p>
+          </div>
+          <div class="bg-white p-6 rounded-[2rem] shadow-xl shadow-blue-900/5 border border-blue-100 flex flex-col items-center">
+             <div class="bg-blue-600 text-white p-4 rounded-2xl mb-4 shadow-lg">
+                <MapPin size={32} />
+             </div>
+             <span class="text-slate-900 font-black text-2xl">{serviceAreas.length} Emirates</span>
+             <span class="text-slate-400 font-medium">Daily Coverage</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {serviceAreas.map((area) => (
+            <div class="group relative p-8 bg-white rounded-3xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 overflow-hidden text-center">
+              <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-100 transition-opacity">
+                 <MapPin size={20} class="text-blue-600" />
+              </div>
+              <span class="block text-blue-600 text-xs font-black uppercase tracking-widest mb-3">Service Point</span>
+              <span class="text-2xl font-black text-slate-900">{area}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
 
     <BlogSection />
 
-    {homeData?.faqs && homeData.faqs.length > 0 && (
-      <div class="bg-slate-50 py-10 border-t border-slate-100">
-        <div class="max-w-7xl mx-auto px-6">
+    {homeData?.faqs && (
+      <div class="bg-white py-24">
+        <div class="max-w-4xl mx-auto px-6">
+          <div class="text-center mb-16">
+            <h2 class="text-4xl font-black text-slate-900 mb-4">Logistics Intelligence</h2>
+            <p class="text-slate-500 text-lg italic">Essential info for your next <strong>pakistan cargo</strong> shipment.</p>
+          </div>
           <FaqSection faqs={homeData.faqs} />
         </div>
       </div>
     )}
+<!-- call to action start -- > 
 
-    <section class="py-20 bg-slate-900 text-white">
-      <div class="max-w-4xl mx-auto px-6 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Ship with the Best Pak Cargo Service?</h2>
-        <p class="text-slate-400 text-lg mb-10 max-w-2xl mx-auto">
-          Get a fast quote for <strong>door-to-door cargo to pakistan</strong>. 
-          Contact our Dubai team directly via WhatsApp or Phone for the best rates.
+    <section class="py-24 bg-slate-900 text-white relative overflow-hidden rounded-[3rem] mx-6 mb-12 shadow-2xl">
+      <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+        <h2 class="text-4xl md:text-7xl font-black mb-8 tracking-tighter italic">Ready to Ship?</h2>
+        <p class="text-slate-400 text-xl mb-12 max-w-2xl mx-auto">
+           Get the most reliable <strong>door-to-door cargo to pakistan</strong> service. Our team is standing by in Dubai to assist you.
         </p>
 
-        <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-          <a 
-            href={`https://wa.me/${settings?.ctaValue}`} 
-            class="w-full sm:w-auto inline-flex justify-center items-center px-10 py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-all text-lg shadow-lg shadow-green-900/20"
-          >
-            <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01"/></svg>
-            WhatsApp Now
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
+          <a href={`https://wa.me/${settings?.ctaValue}`} class="w-full sm:w-auto px-12 py-5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-2xl transition-all text-xl shadow-xl shadow-green-900/40">
+            WhatsApp Estimate
           </a>
-          <a 
-            href={`tel:${settings?.phone}`} 
-            class="w-full sm:w-auto inline-flex justify-center items-center px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all text-lg"
-          >
+          <a href={`tel:${settings?.phone}`} class="w-full sm:w-auto px-12 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all text-xl shadow-xl shadow-blue-900/40">
             Call Specialist
           </a>
         </div>

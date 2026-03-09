@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Block admin/studio paths to save crawl budget
+Disallow: /studio/
+Disallow: /admin/
+
+# Point to the sitemap
+Sitemap: https://pakcargo.ae/sitemap-index.xml

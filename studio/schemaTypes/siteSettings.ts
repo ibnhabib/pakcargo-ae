@@ -16,39 +16,82 @@ export default defineType({
       title: 'Global Site Title',
       type: 'string',
       group: 'seo',
-      description: 'The main title for Google (e.g., Best Cargo to Pakistan | PakCargo.ae)',
-      validation: (Rule) => Rule.required().max(160),
+      description: 'The main title for Google (50-60 characters recommended).',
+      validation: (Rule) => Rule.required().max(60),
     }),
     defineField({
       name: 'description',
       title: 'Global Meta Description',
       type: 'text',
       group: 'seo',
-      description: 'The summary that appears in search results.',
+      description: 'The snippet for humans in search results (150-160 chars).',
       validation: (Rule) => Rule.required().min(120).max(160),
+    }),
+    defineField({
+      name: 'keywords',
+      title: 'Core Business Keywords',
+      type: 'array',
+      group: 'seo',
+      description: 'These populate the Schema "knowsAbout" field. Add your locked keywords here.',
+      of: [{ type: 'string' }],
     }),
     defineField({
       name: 'ogImage',
       title: 'Social Sharing Image',
       type: 'image',
       group: 'seo',
-      description: 'Image shown on WhatsApp/Facebook (1200x630px recommended).',
+      description: 'Image shown on WhatsApp/Facebook (1200x630px).',
     }),
 
     // --- BUSINESS IDENTITY GROUP (For Schema.org) ---
     defineField({
-      name: 'address',
-      title: 'Dubai Office Address',
+      name: 'businessName',
+      title: 'Official Business Name',
       type: 'string',
       group: 'business',
-      description: 'Physical address for Local SEO ranking.',
+      initialValue: 'PakCargo.ae',
+    }),
+    defineField({
+      name: 'address',
+      title: 'Office/Warehouse Address',
+      type: 'string',
+      group: 'business',
+      description: 'Physical location for Local SEO trust.',
     }),
     defineField({
       name: 'phone',
       title: 'Business Phone',
       type: 'string',
       group: 'business',
-      description: 'Format: +971 5X XXX XXXX',
+      description: 'Primary contact for schema (e.g., +971 50 123 4567).',
+    }),
+    defineField({
+      name: 'mainServiceAreas',
+      title: 'Main Service Regions',
+      type: 'array',
+      group: 'business',
+      description: 'Emirates you serve (e.g., Dubai, Abu Dhabi).',
+      of: [{ type: 'string' }],
+      options: {
+        list: [
+          { title: 'Dubai', value: 'Dubai' },
+          { title: 'Abu Dhabi', value: 'Abu Dhabi' },
+          { title: 'Sharjah', value: 'Sharjah' },
+          { title: 'Ajman', value: 'Ajman' },
+          { title: 'Al Ain', value: 'Al Ain' },
+          { title: 'Ras Al Khaimah', value: 'Ras Al Khaimah' },
+          { title: 'Fujairah', value: 'Fujairah' },
+          { title: 'Umm Al Quwain', value: 'Umm Al Quwain' },
+        ]
+      }
+    }),
+    defineField({
+      name: 'socialLinks',
+      title: 'Social Media Profiles (sameAs)',
+      type: 'array',
+      group: 'business',
+      description: 'Links to Facebook, Instagram, etc. to prove brand authority.',
+      of: [{ type: 'url' }],
     }),
 
     // --- EXISTING CONTACT & CTA GROUP ---
@@ -57,7 +100,6 @@ export default defineType({
       title: 'Announcement Bar (Global)',
       type: 'string',
       group: 'contact',
-      description: 'Alerts for delays or holiday schedules.'
     }),
     defineField({
       name: 'ctaType',
@@ -67,7 +109,6 @@ export default defineType({
       options: {
         list: [
           { title: 'WhatsApp', value: 'whatsapp' },
-          { title: 'Telegram', value: 'telegram' },
           { title: 'Phone', value: 'phone' }
         ],
       },
@@ -77,7 +118,7 @@ export default defineType({
       title: 'CTA Contact Value',
       type: 'string',
       group: 'contact',
-      description: 'Enter phone number or link.'
+      description: 'Enter phone number (e.g., 971501234567 for WhatsApp).'
     }),
   ],
 })

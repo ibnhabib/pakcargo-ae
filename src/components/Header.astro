@@ -1,0 +1,49 @@
+---
+import { sanityClient } from "sanity:client";
+import { Phone, MessageSquare, ChevronDown } from 'lucide-react';
+import Logo from './Logo.astro';
+
+const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+const services = await sanityClient.fetch(`*[_type == "service"] | order(title asc)`);
+---
+
+<header class="sticky top-0 z-[100] bg-white border-b border-slate-100 shadow-sm">
+  <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+    
+    <a href="/" class="hover:opacity-90 transition-opacity">
+      <Logo />
+    </a>
+
+    <nav class="hidden md:flex items-center gap-8">
+      <a href="/" class="font-semibold text-slate-600 hover:text-blue-600">Home</a>
+      
+      <div class="relative group py-4">
+        <button class="font-semibold text-slate-600 group-hover:text-blue-600 flex items-center gap-1">
+          Services
+          <ChevronDown size={14} />
+        </button>
+        
+        <div class="absolute top-full -left-4 w-60 bg-white border border-slate-100 shadow-xl rounded-xl p-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all">
+          {services.map((s) => (
+            <a href={`/services/${s.slug.current}`} class="block px-4 py-2 hover:bg-blue-50 rounded-lg font-medium text-slate-700">
+              {s.title}
+            </a>
+          ))}
+        </div>
+      </div>
+      
+      <a href="#rates" class="font-semibold text-slate-600 hover:text-blue-600">Rates</a>
+    </nav>
+
+    <div class="flex items-center gap-4">
+      <a href={`tel:${settings?.phone}`} class="hidden lg:flex items-center gap-2 font-bold text-slate-900">
+        <Phone size={18} class="text-blue-600" />
+        {settings?.phone}
+      </a>
+      <a href={`https://wa.me/${settings?.ctaValue}`} class="bg-green-600 text-white px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">
+        <MessageSquare size={18} />
+        WhatsApp
+      </a>
+    </div>
+  </div>
+</header>
