@@ -6,7 +6,7 @@ import { urlFor } from '../lib/sanity';
 import PriceGrid from '../components/PriceGrid.astro';
 import ServiceSection from '../components/ServiceSection.astro';
 import Hero from '../components/Hero.astro';
-import TrustSection from '../components/TrustSection.astro'; // REPLACED WhyChooseUs
+import TrustSection from '../components/TrustSection.astro';
 import PartnerLogos from '../components/PartnerLogos.astro';
 import FaqSection from '../components/FaqSection.astro';
 import { MapPin } from 'lucide-react';
@@ -14,7 +14,7 @@ import { MapPin } from 'lucide-react';
 // 1. Optimized GROQ Fetching
 const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
 
-// Fetch only featured services from Homepage, or all services if none featured
+// Fetch Homepage data including our new SEO override fields
 const homeData = await sanityClient.fetch(`*[_type == "homepage"][0]{
   ...,
   featuredServices[]->,
@@ -25,7 +25,10 @@ const homeData = await sanityClient.fetch(`*[_type == "homepage"][0]{
     atomicAnswer,
     detailedAnswer,
     lastReviewed
-  }
+  },
+  seoTitle,
+  seoDescription,
+  seoKeywords
 }`);
 
 const services =
@@ -38,21 +41,21 @@ const partners = homeData?.featuredPartners || (await sanityClient.fetch(`*[_typ
 
 const serviceAreas = settings?.mainServiceAreas || ['Dubai', 'Abu Dhabi', 'Sharjah'];
 
-// 2. Advanced JSON-LD Schema (2026 E-E-A-T Standards)
+// 2. Advanced JSON-LD Schema
 const businessSchema = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'LogisticsCompany', // More specific than LocalBusiness
-      '@id': 'https://pakcargo.ae/#organization',
+      '@type': 'LogisticsCompany',
+      '@id': `${settings?.siteUrl || 'https://pakcargo.ae'}/#organization`,
       name: settings?.businessName || 'PakCargo.ae',
       legalName: settings?.legalName,
-      taxID: settings?.tradeLicense, // Tells Google you are a legal UAE entity
-      url: 'https://pakcargo.ae',
-      logo: 'https://pakcargo.ae/favicon.svg',
+      taxID: settings?.tradeLicense,
+      url: settings?.siteUrl || 'https://pakcargo.ae',
+      logo: `${settings?.siteUrl || 'https://pakcargo.ae'}/favicon.svg`,
       image: settings?.ogImage
         ? urlFor(settings.ogImage).width(1200).url()
-        : 'https://pakcargo.ae/og-image.jpg',
+        : `${settings?.siteUrl || 'https://pakcargo.ae'}/og-image.jpg`,
       telephone: settings?.phone,
       address: {
         '@type': 'PostalAddress',
@@ -71,7 +74,8 @@ const businessSchema = {
         ...serviceAreas.map((city) => ({ '@type': 'City', name: city })),
         { '@type': 'Country', name: 'Pakistan' },
       ],
-      knowsAbout: settings?.keywords || ['pakistan cargo', 'cargo to pakistan'],
+      knowsAbout: homeData?.seoKeywords ||
+        settings?.keywords || ['pakistan cargo', 'cargo to pakistan'],
     },
   ],
 };
@@ -83,13 +87,17 @@ const faqSchema = homeData?.faqs
       mainEntity: homeData.faqs.map((faq) => ({
         '@type': 'Question',
         name: faq.question,
-        acceptedAnswer: { '@type': 'Answer', text: faq.atomicAnswer },
+        acceptedAnswer: { '@type': 'Answer', text: faq.atomicAnswer || faq.answer },
       })),
     }
   : null;
 ---
 
-<Layout title={settings?.title} description={settings?.description}>
+<Layout
+  title={homeData?.seoTitle}
+  description={homeData?.seoDescription}
+  keywords={homeData?.seoKeywords}
+>
   <script type="application/ld+json" set:html={JSON.stringify(businessSchema)} />
   {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 
@@ -112,7 +120,6 @@ const faqSchema = homeData?.faqs
 
     <PartnerLogos partners={partners} />
 
-    {/* Location Authority Section */}
     <section class="py-24 bg-slate-50 border-y border-slate-100">
       <div class="max-w-6xl mx-auto px-6">
         <div class="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
@@ -169,7 +176,6 @@ const faqSchema = homeData?.faqs
       )
     }
 
-    {/* Dynamic CTA using Sanity Site Settings */}
     <section
       class="py-24 bg-slate-900 text-white relative overflow-hidden rounded-[3rem] mx-6 mb-12 shadow-2xl"
     >
@@ -177,7 +183,7 @@ const faqSchema = homeData?.faqs
         <h2 class="text-4xl md:text-7xl font-black mb-8 tracking-tighter italic">Ready to Ship?</h2>
         <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
           <a
-            href={`https://wa.me/${settings?.whatsappNumber || settings?.ctaValue}`}
+            href={`https://wa.me/${settings?.whatsappNumber}`}
             class="w-full sm:w-auto px-12 py-5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-2xl transition-all text-xl"
           >
             WhatsApp Estimate
