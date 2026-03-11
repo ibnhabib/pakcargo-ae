@@ -4,6 +4,7 @@ import Layout from '../layouts/Layout.astro';
 import { Mail, Phone, MapPin, Clock, MessageSquare, ShieldCheck } from 'lucide-react';
 
 const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+const contactData = await sanityClient.fetch(`*[_id == "contact-page"][0]`);
 
 const contactSchema = {
   '@context': 'https://schema.org',
@@ -32,16 +33,22 @@ const contactSchema = {
 ---
 
 <Layout
-  title={`Contact Us | ${settings?.businessName || 'PakCargo.ae'}`}
-  description="Contact our cargo specialists in Dubai and Abu Dhabi for the best rates to Pakistan. 24/7 Support available."
+  title={`${contactData?.seoTitle || 'Contact Us'} | ${settings?.businessName || 'PakCargo.ae'}`}
+  description={contactData?.metaDescription ||
+    'Contact our cargo specialists in Dubai and Abu Dhabi for the best rates to Pakistan.'}
 >
   <script type="application/ld+json" set:html={JSON.stringify(contactSchema)} slot="head" />
 
   <main class="bg-slate-50">
     <section class="bg-slate-900 pt-32 pb-20 px-6 text-center">
-      <h1 class="text-4xl md:text-6xl font-black text-white mb-4">Get a Fast Quote</h1>
+      <h1 class="text-4xl md:text-6xl font-black text-white mb-4">
+        {contactData?.heroTitle || 'Get a Fast Quote'}
+      </h1>
       <p class="text-blue-200 text-lg max-w-2xl mx-auto">
-        Our specialists are ready to help with your sea and air cargo needs 24/7.
+        {
+          contactData?.heroSubtitle ||
+            'Our specialists are ready to help with your sea and air cargo needs 24/7.'
+        }
       </p>
     </section>
 
@@ -96,7 +103,9 @@ const contactSchema = {
                 </div>
                 <div>
                   <h4 class="font-bold text-lg text-slate-900 mb-1">Working Hours</h4>
-                  <p class="text-slate-600 leading-relaxed">24 Hours / 7 Days a Week Support</p>
+                  <p class="text-slate-600 leading-relaxed">
+                    {contactData?.workingHours || '24 Hours / 7 Days a Week Support'}
+                  </p>
                 </div>
               </div>
               <div class="flex gap-6">
@@ -118,9 +127,14 @@ const contactSchema = {
           <div
             class="bg-blue-600 rounded-[2.5rem] p-8 text-white sticky top-24 shadow-2xl shadow-blue-200"
           >
-            <h3 class="text-2xl font-bold mb-4">Fastest Tracking</h3>
+            <h3 class="text-2xl font-bold mb-4">
+              {contactData?.sidebarTitle || 'Fastest Tracking'}
+            </h3>
             <p class="text-blue-100 mb-8 leading-relaxed">
-              Need to check your shipment status? Please have your Booking ID ready when calling.
+              {
+                contactData?.sidebarText ||
+                  'Need to check your shipment status? Please have your Booking ID ready when calling.'
+              }
             </p>
             <div class="space-y-4">
               <div class="p-4 bg-white/10 rounded-2xl border border-white/10">
