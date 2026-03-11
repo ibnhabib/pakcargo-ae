@@ -1,0 +1,196 @@
+---
+import { sanityClient } from 'sanity:client';
+import Layout from '../../layouts/Layout.astro';
+import { MapPin, Clock, Truck, Ship, Plane, PhoneCall, ShieldCheck } from 'lucide-react';
+import { urlFor } from '../../lib/sanity';
+
+export async function getStaticPaths() {
+  // Define your main UAE hubs
+  const hubs = [
+    {
+      slug: 'dubai',
+      name: 'Dubai',
+      areas: ['Deira', 'Bur Dubai', 'Al Quoz', 'Jebel Ali', 'International City'],
+    },
+    {
+      slug: 'abu-dhabi',
+      name: 'Abu Dhabi',
+      areas: ['Musaffah', 'Khalifa City', 'Baniyas', 'Mohammed Bin Zayed City'],
+    },
+    {
+      slug: 'sharjah',
+      name: 'Sharjah',
+      areas: ['Al Nahda', 'Rolla', 'Industrial Area', 'Muwaileh'],
+    },
+  ];
+
+  return hubs.map((hub) => ({
+    params: { slug: hub.slug },
+    props: { hub },
+  }));
+}
+
+const { hub } = Astro.props;
+const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+
+// Fetch services to show on this local page
+const services = await sanityClient.fetch(`*[_type == "service"][0...3]`);
+
+const originSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'GovernmentService', // Or "Service"
+  name: `Cargo Services from ${hub.name} to Pakistan`,
+  serviceOperator: {
+    '@type': 'LogisticsBusiness',
+    name: settings?.businessName || 'PakCargo.ae',
+  },
+  areaServed: {
+    '@type': 'City',
+    name: hub.name,
+  },
+  description: `Reliable door-to-door cargo and shipping services from ${hub.name} to all cities in Pakistan.`,
+};
+---
+
+<Layout
+  title={`Cargo to Pakistan from ${hub.name} | Door-to-Door Service`}
+  description={`Best rates for shipping from ${hub.name} to Pakistan. Daily pickups in ${hub.areas.join(', ')}. Sea and Air cargo specialists.`}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(originSchema)} slot="head" />
+
+  <main>
+    <section class="bg-slate-900 py-24 relative overflow-hidden">
+      <div class="max-w-6xl mx-auto px-6 relative z-10">
+        <div
+          class="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-blue-300 text-xs font-bold mb-6"
+        >
+          <MapPin size={14} />
+          <span>Local Hub: {hub.name}, UAE</span>
+        </div>
+        <h1 class="text-4xl md:text-7xl font-black text-white mb-6">
+          Reliable Cargo from <span class="text-blue-500">{hub.name}</span>
+          <br />to Pakistan
+        </h1>
+        <p class="text-slate-400 text-lg max-w-2xl leading-relaxed">
+          We offer daily door-to-door pickups across all major areas of {hub.name}. Whether it's a
+          single box or a full container, we ensure safe delivery to any city in Pakistan.
+        </p>
+      </div>
+    </section>
+
+    <section class="py-12 bg-white border-b border-slate-100">
+      <div class="max-w-6xl mx-auto px-6">
+        <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 text-center">
+          Standard Pickup Locations in {hub.name}
+        </h2>
+        <div class="flex flex-wrap justify-center gap-3">
+          {
+            hub.areas.map((area) => (
+              <span class="px-5 py-2 bg-slate-50 border border-slate-200 rounded-full text-slate-700 font-medium text-sm">
+                {area}
+              </span>
+            ))
+          }
+          <span
+            class="px-5 py-2 bg-blue-50 border border-blue-100 rounded-full text-blue-600 font-bold text-sm"
+          >
+            + All Other Areas
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-24 max-w-6xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+        <div class="max-w-2xl">
+          <h2 class="text-3xl md:text-5xl font-black text-slate-900 mb-4 italic">
+            Available Services in {hub.name}
+          </h2>
+          <p class="text-slate-600">
+            Choose the best shipping method for your needs. We handle customs documentation directly
+            from our {hub.name} office.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {
+          services.map((service) => (
+            <div class="group bg-white rounded-[2.5rem] border border-slate-200 p-8 hover:shadow-2xl hover:border-blue-500 transition-all">
+              <div class="mb-6 p-4 bg-slate-50 rounded-2xl w-fit group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <Truck size={24} />
+              </div>
+              <h3 class="text-2xl font-bold text-slate-900 mb-4">{service.title}</h3>
+              <p class="text-slate-600 text-sm mb-8 line-clamp-3">{service.description}</p>
+              <a
+                href={`/services/${service.slug.current}`}
+                class="flex items-center gap-2 font-bold text-blue-600 hover:gap-4 transition-all"
+              >
+                View Rates <span class="text-xl">→</span>
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="py-20 bg-slate-50 rounded-[4rem] mx-4 mb-20 px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl font-black text-slate-900 mb-12">
+          Why {settings?.businessName} in {hub.name}?
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+          <div class="flex gap-4">
+            <div
+              class="shrink-0 w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-blue-600"
+            >
+              <Clock size={20} />
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-900">Same-Day Pickup</h4>
+              <p class="text-sm text-slate-600">
+                Call us before 2:00 PM for same-day cargo collection in {hub.name}.
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div
+              class="shrink-0 w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-blue-600"
+            >
+              <ShieldCheck size={20} />
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-900">Secure Packaging</h4>
+              <p class="text-sm text-slate-600">
+                On-site industrial packing services available at our {hub.name} hub.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-6 pb-24 text-center">
+      <div class="bg-blue-600 rounded-[3rem] p-12 text-white shadow-2xl shadow-blue-200">
+        <h2 class="text-3xl md:text-5xl font-black mb-6">Ship from {hub.name} Today</h2>
+        <p class="text-blue-100 mb-10 text-lg">
+          Contact our {hub.name} operations team for the best weight-based rates.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href={`tel:${settings?.phone}`}
+            class="bg-white text-blue-600 px-8 py-4 rounded-2xl font-black flex items-center justify-center gap-2"
+          >
+            <PhoneCall size={18} /> Call Specialist
+          </a>
+          <a
+            href={`https://wa.me/${settings?.whatsappNumber}?text=Hi, I want to ship from ${hub.name} to Pakistan.`}
+            class="bg-green-500 text-white px-8 py-4 rounded-2xl font-black flex items-center justify-center gap-2"
+          >
+            WhatsApp Quote
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

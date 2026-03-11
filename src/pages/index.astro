@@ -1,14 +1,14 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import BlogSection from "../components/BlogSection.astro";
-import { sanityClient } from "sanity:client";
-import { urlFor } from "../lib/sanity";
-import PriceGrid from "../components/PriceGrid.astro";
-import ServiceSection from "../components/ServiceSection.astro";
-import Hero from "../components/Hero.astro";
-import TrustSection from "../components/TrustSection.astro"; // REPLACED WhyChooseUs
-import PartnerLogos from "../components/PartnerLogos.astro";
-import FaqSection from "../components/FaqSection.astro";
+import Layout from '../layouts/Layout.astro';
+import BlogSection from '../components/BlogSection.astro';
+import { sanityClient } from 'sanity:client';
+import { urlFor } from '../lib/sanity';
+import PriceGrid from '../components/PriceGrid.astro';
+import ServiceSection from '../components/ServiceSection.astro';
+import Hero from '../components/Hero.astro';
+import TrustSection from '../components/TrustSection.astro'; // REPLACED WhyChooseUs
+import PartnerLogos from '../components/PartnerLogos.astro';
+import FaqSection from '../components/FaqSection.astro';
 import { MapPin } from 'lucide-react';
 
 // 1. Optimized GROQ Fetching
@@ -28,79 +28,84 @@ const homeData = await sanityClient.fetch(`*[_type == "homepage"][0]{
   }
 }`);
 
-const services = homeData?.featuredServices || await sanityClient.fetch(`*[_type == "service"] | order(order asc)`);
+const services =
+  homeData?.featuredServices ||
+  (await sanityClient.fetch(`*[_type == "service"] | order(order asc)`));
 const rates = await sanityClient.fetch(`*[_type == "rateCard"] | order(order asc)`);
-const trustData = homeData?.featuredTrustPoints || await sanityClient.fetch(`*[_type == "trustPoints"][0]`);
-const partners = homeData?.featuredPartners || await sanityClient.fetch(`*[_type == "partner"]`);
+const trustData =
+  homeData?.featuredTrustPoints || (await sanityClient.fetch(`*[_type == "trustPoints"][0]`));
+const partners = homeData?.featuredPartners || (await sanityClient.fetch(`*[_type == "partner"]`));
 
-const serviceAreas = settings?.mainServiceAreas || ["Dubai", "Abu Dhabi", "Sharjah"];
+const serviceAreas = settings?.mainServiceAreas || ['Dubai', 'Abu Dhabi', 'Sharjah'];
 
 // 2. Advanced JSON-LD Schema (2026 E-E-A-T Standards)
 const businessSchema = {
-  "@context": "https://schema.org",
-  "@graph": [
+  '@context': 'https://schema.org',
+  '@graph': [
     {
-      "@type": "LogisticsCompany", // More specific than LocalBusiness
-      "@id": "https://pakcargo.ae/#organization",
-      "name": settings?.businessName || "PakCargo.ae",
-      "legalName": settings?.legalName,
-      "taxID": settings?.tradeLicense, // Tells Google you are a legal UAE entity
-      "url": "https://pakcargo.ae",
-      "logo": "https://pakcargo.ae/favicon.svg",
-      "image": settings?.ogImage ? urlFor(settings.ogImage).width(1200).url() : "https://pakcargo.ae/og-image.jpg",
-      "telephone": settings?.phone,
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": settings?.address,
-        "addressLocality": "Dubai",
-        "addressCountry": "AE"
+      '@type': 'LogisticsCompany', // More specific than LocalBusiness
+      '@id': 'https://pakcargo.ae/#organization',
+      name: settings?.businessName || 'PakCargo.ae',
+      legalName: settings?.legalName,
+      taxID: settings?.tradeLicense, // Tells Google you are a legal UAE entity
+      url: 'https://pakcargo.ae',
+      logo: 'https://pakcargo.ae/favicon.svg',
+      image: settings?.ogImage
+        ? urlFor(settings.ogImage).width(1200).url()
+        : 'https://pakcargo.ae/og-image.jpg',
+      telephone: settings?.phone,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: settings?.address,
+        addressLocality: 'Dubai',
+        addressCountry: 'AE',
       },
-      "geo": settings?.geoCoordinates ? {
-        "@type": "GeoCoordinates",
-        "latitude": settings.geoCoordinates.lat,
-        "longitude": settings.geoCoordinates.lng
-      } : undefined,
-      "areaServed": [
-        ...serviceAreas.map(city => ({ "@type": "City", "name": city })),
-        { "@type": "Country", "name": "Pakistan" }
+      geo: settings?.geoCoordinates
+        ? {
+            '@type': 'GeoCoordinates',
+            latitude: settings.geoCoordinates.lat,
+            longitude: settings.geoCoordinates.lng,
+          }
+        : undefined,
+      areaServed: [
+        ...serviceAreas.map((city) => ({ '@type': 'City', name: city })),
+        { '@type': 'Country', name: 'Pakistan' },
       ],
-      "knowsAbout": settings?.keywords || ["pakistan cargo", "cargo to pakistan"]
-    }
-  ]
+      knowsAbout: settings?.keywords || ['pakistan cargo', 'cargo to pakistan'],
+    },
+  ],
 };
 
-const faqSchema = homeData?.faqs ? {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": homeData.faqs.map((faq) => ({
-    "@type": "Question",
-    "name": faq.question,
-    "acceptedAnswer": { "@type": "Answer", "text": faq.atomicAnswer }
-  }))
-} : null;
+const faqSchema = homeData?.faqs
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: homeData.faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: { '@type': 'Answer', text: faq.atomicAnswer },
+      })),
+    }
+  : null;
 ---
 
-<BaseLayout 
-  title={settings?.title}
-  description={settings?.description}
->
+<Layout title={settings?.title} description={settings?.description}>
   <script type="application/ld+json" set:html={JSON.stringify(businessSchema)} />
   {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 
-  <Hero 
-    title={homeData?.heroTitle} 
-    subtitle={homeData?.heroSubtitle}
-  />
+  <Hero title={homeData?.heroTitle} subtitle={homeData?.heroSubtitle} />
 
   <main>
     <ServiceSection services={services} />
-    
+
     {trustData && <TrustSection trustData={trustData} />}
 
     <section id="rates" class="py-20 bg-white border-t border-slate-50">
       <div class="max-w-7xl mx-auto px-6 text-center">
         <h2 class="text-4xl font-black text-slate-900 mb-4 italic">Competitive Shipping Rates</h2>
-        <p class="text-slate-600 text-lg mb-12">Verified <strong>pak cargo</strong> pricing for {new Date().getFullYear()} shipments.</p>
+        <p class="text-slate-600 text-lg mb-12">
+          Verified <strong>pak cargo</strong> pricing for {new Date().getFullYear()} shipments.
+        </p>
         <PriceGrid rates={rates} />
       </div>
     </section>
@@ -113,57 +118,78 @@ const faqSchema = homeData?.faqs ? {
         <div class="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
           <div class="max-w-2xl">
             <h2 class="text-3xl md:text-6xl font-black text-slate-900 mb-6 leading-tight italic">
-              Door-to-Door Pickup <br/>Across the <span class="text-blue-600 underline decoration-blue-200 underline-offset-8">UAE</span>
+              Door-to-Door Pickup <br />Across the <span
+                class="text-blue-600 underline decoration-blue-200 underline-offset-8">UAE</span
+              >
             </h2>
             <p class="text-xl text-slate-600 leading-relaxed">
-              Full logistics coverage including Jebel Ali hub operations and last-mile delivery to all Pakistan provinces.
+              Full logistics coverage including Jebel Ali hub operations and last-mile delivery to
+              all Pakistan provinces.
             </p>
           </div>
-          <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-blue-100 flex flex-col items-center min-w-[200px]">
-              <div class="bg-blue-600 text-white p-4 rounded-2xl mb-4">
-                <MapPin size={32} />
-              </div>
-              <span class="text-slate-900 font-black text-2xl">{serviceAreas.length} Primary Zones</span>
+          <div
+            class="bg-white p-8 rounded-[2rem] shadow-xl border border-blue-100 flex flex-col items-center min-w-[200px]"
+          >
+            <div class="bg-blue-600 text-white p-4 rounded-2xl mb-4">
+              <MapPin size={32} />
+            </div>
+            <span class="text-slate-900 font-black text-2xl"
+              >{serviceAreas.length} Primary Zones</span
+            >
           </div>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {serviceAreas.map((area) => (
-            <div class="p-8 bg-white rounded-3xl border border-slate-200 text-center hover:border-blue-500 hover:shadow-lg transition-all">
-              <span class="text-2xl font-black text-slate-900">{area}</span>
-            </div>
-          ))}
+          {
+            serviceAreas.map((area) => (
+              <div class="p-8 bg-white rounded-3xl border border-slate-200 text-center hover:border-blue-500 hover:shadow-lg transition-all">
+                <span class="text-2xl font-black text-slate-900">{area}</span>
+              </div>
+            ))
+          }
         </div>
       </div>
     </section>
 
     <BlogSection />
 
-    {homeData?.faqs && (
-      <div class="bg-white py-24">
-        <div class="max-w-4xl mx-auto px-6">
-          <div class="text-center mb-16">
-            <h2 class="text-4xl font-black text-slate-900 mb-4">Logistics Intelligence</h2>
-            <p class="text-slate-500 text-lg">Essential facts for your <strong>pakistan cargo</strong> shipment.</p>
+    {
+      homeData?.faqs && (
+        <div class="bg-white py-24">
+          <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-16">
+              <h2 class="text-4xl font-black text-slate-900 mb-4">Logistics Intelligence</h2>
+              <p class="text-slate-500 text-lg">
+                Essential facts for your <strong>pakistan cargo</strong> shipment.
+              </p>
+            </div>
+            <FaqSection faqs={homeData.faqs} />
           </div>
-          <FaqSection faqs={homeData.faqs} />
         </div>
-      </div>
-    )}
+      )
+    }
 
     {/* Dynamic CTA using Sanity Site Settings */}
-    <section class="py-24 bg-slate-900 text-white relative overflow-hidden rounded-[3rem] mx-6 mb-12 shadow-2xl">
+    <section
+      class="py-24 bg-slate-900 text-white relative overflow-hidden rounded-[3rem] mx-6 mb-12 shadow-2xl"
+    >
       <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
         <h2 class="text-4xl md:text-7xl font-black mb-8 tracking-tighter italic">Ready to Ship?</h2>
         <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
-          <a href={`https://wa.me/${settings?.whatsappNumber || settings?.ctaValue}`} class="w-full sm:w-auto px-12 py-5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-2xl transition-all text-xl">
+          <a
+            href={`https://wa.me/${settings?.whatsappNumber || settings?.ctaValue}`}
+            class="w-full sm:w-auto px-12 py-5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-2xl transition-all text-xl"
+          >
             WhatsApp Estimate
           </a>
-          <a href={`tel:${settings?.phone}`} class="w-full sm:w-auto px-12 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all text-xl">
+          <a
+            href={`tel:${settings?.phone}`}
+            class="w-full sm:w-auto px-12 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all text-xl"
+          >
             Call Specialist
           </a>
         </div>
       </div>
     </section>
   </main>
-</BaseLayout>
+</Layout>

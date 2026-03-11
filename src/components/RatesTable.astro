@@ -1,0 +1,66 @@
+---
+const { rates, serviceTitle } = Astro.props;
+import { ListChecks, Info } from 'lucide-react';
+---
+
+{
+  rates && rates.length > 0 && (
+    <div class="my-12">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-2 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-100">
+          <ListChecks size={24} />
+        </div>
+        <div>
+          <h3 class="text-2xl font-black text-slate-900 italic uppercase tracking-tight">
+            Itemized {serviceTitle} Rates
+          </h3>
+          <p class="text-xs text-slate-500 font-medium">
+            Standard rates for common items to Pakistan
+          </p>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-[2rem] border border-slate-200 shadow-sm bg-white">
+        <div class="hidden md:grid grid-cols-4 bg-slate-50 border-b border-slate-200 p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <div>Item Description</div>
+          <div>Unit/Measure</div>
+          <div>Rate (AED)</div>
+          <div>Service Notes</div>
+        </div>
+
+        <div class="divide-y divide-slate-100">
+          {rates.map((rate: any) => (
+            <div class="grid grid-cols-1 md:grid-cols-4 p-6 hover:bg-blue-50/40 transition-colors items-center gap-2 md:gap-0">
+              <div class="font-bold text-slate-800 text-base">{rate.item}</div>
+              <div class="text-slate-500 text-sm">
+                <span class="md:hidden font-bold text-slate-300 mr-2 uppercase text-[10px]">
+                  Unit:
+                </span>
+                {rate.unit}
+              </div>
+              <div class="text-blue-600 font-black text-xl md:text-lg">
+                {rate.price} <span class="text-[10px] text-slate-400">AED</span>
+              </div>
+              <div class="text-slate-500 text-xs flex items-start gap-2">
+                {rate.note && (
+                  <>
+                    <Info size={14} class="text-blue-300 shrink-0 mt-0.5" />{' '}
+                    <span>{rate.note}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="mt-4 flex items-center gap-2 text-[10px] text-slate-400 px-4">
+        <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+        <p>
+          Rates are indicative. Final price determined at our Dubai/Abu Dhabi warehouse weighing
+          station.
+        </p>
+      </div>
+    </div>
+  )
+}

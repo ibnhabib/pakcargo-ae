@@ -1,93 +1,115 @@
 ---
-import { sanityClient } from "sanity:client";
+import { sanityClient } from 'sanity:client';
 import { Phone, MessageSquare, ChevronDown, Menu, X } from 'lucide-react';
 import Logo from './Logo.astro';
 
-const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
-// CHANGED: Now ordering by the 'order' field instead of 'title'
-const services = await sanityClient.fetch(`*[_type == "service"] | order(order asc)`) || [];
+// Fetching Global Settings including our new Header Menu
+const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]{
+  ...,
+  headerMenu[]
+}`);
+
+// Fetching Services for the dropdown
+const services = (await sanityClient.fetch(`*[_type == "service"] | order(order asc)`)) || [];
+
+// Safety check for navLinks
+const navLinks = settings?.headerMenu || [];
 ---
 
 <header class="sticky top-0 z-[100] bg-white border-b border-slate-100 shadow-sm">
   <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
-    
     <a href="/" class="hover:opacity-90 transition-opacity w-32 md:w-auto">
       <Logo />
     </a>
 
     <nav class="hidden md:flex items-center gap-8">
-      <a href="/" class="font-semibold text-slate-600 hover:text-blue-600">Home</a>
-      
+      {
+        navLinks.map((item) => (
+          <a
+            href={item.link}
+            class="font-semibold text-slate-600 hover:text-blue-600 transition-colors"
+          >
+            {item.label}
+          </a>
+        ))
+      }
+
       <div class="relative group py-4">
-        <button class="font-semibold text-slate-600 group-hover:text-blue-600 flex items-center gap-1">
+        <button
+          class="font-semibold text-slate-600 group-hover:text-blue-600 flex items-center gap-1"
+        >
           Services
           <ChevronDown size={14} />
         </button>
-        
-        <div class="absolute top-full -left-4 w-60 bg-white border border-slate-100 shadow-xl rounded-xl p-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all">
-          {services.map((s) => (
-            <a href={`/services/${s.slug.current}`} class="block px-4 py-2 hover:bg-blue-50 rounded-lg font-medium text-slate-700">
-              {s.title}
-            </a>
-          ))}
+
+        <div
+          class="absolute top-full -left-4 w-60 bg-white border border-slate-100 shadow-xl rounded-xl p-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all"
+        >
+          {
+            services.map((s) => (
+              <a
+                href={`/services/${s.slug.current}`}
+                class="block px-4 py-2 hover:bg-blue-50 rounded-lg font-medium text-slate-700 transition-colors"
+              >
+                {s.title}
+              </a>
+            ))
+          }
         </div>
       </div>
-      
-      <a href="#rates" class="font-semibold text-slate-600 hover:text-blue-600">Rates</a>
     </nav>
 
     <div class="flex items-center gap-2 md:gap-4">
-      <a href={`tel:${settings?.phone}`} class="md:hidden p-2.5 bg-blue-50 text-blue-600 rounded-full" aria-label="Call Us">
-        <Phone size={20} />
-      </a>
-
-      <a href={`https://wa.me/${settings?.whatsappNumber || settings?.ctaValue}`} class="md:hidden p-2.5 bg-green-50 text-green-600 rounded-full" aria-label="WhatsApp Us">
-        <MessageSquare size={20} />
-      </a>
-
-      <a href={`tel:${settings?.phone}`} class="hidden lg:flex items-center gap-2 font-bold text-slate-900">
+      <a
+        href={`tel:${settings?.phone}`}
+        class="hidden lg:flex items-center gap-2 font-bold text-slate-900"
+      >
         <Phone size={18} class="text-blue-600" />
         {settings?.phone}
       </a>
-      
-      <a href={`https://wa.me/${settings?.whatsappNumber || settings?.ctaValue}`} class="hidden md:flex bg-green-600 text-white px-6 py-2.5 rounded-lg font-bold items-center gap-2 hover:bg-green-700 transition-colors">
+
+      <a
+        href={`https://wa.me/${settings?.whatsappNumber}`}
+        class="hidden md:flex bg-green-600 text-white px-6 py-2.5 rounded-lg font-bold items-center gap-2 hover:bg-green-700 transition-colors shadow-lg shadow-green-100"
+      >
         <MessageSquare size={18} />
         WhatsApp
       </a>
 
-      <button class="md:hidden p-2 text-slate-600 relative z-[110]" id="mobile-menu-button" aria-label="Toggle Menu">
-        <div id="hamburger-icon">
-          <Menu size={28} />
-        </div>
-        <div id="close-icon" class="hidden">
-          <X size={28} />
-        </div>
+      <button class="md:hidden p-2 text-slate-600 relative z-[110]" id="mobile-menu-button">
+        <Menu size={28} id="hamburger-icon" />
+        <X size={28} id="close-icon" class="hidden" />
       </button>
     </div>
   </div>
 
-  <div id="mobile-menu" class="fixed inset-0 bg-white z-[105] translate-x-full transition-transform duration-300 md:hidden pt-24 px-6">
+  <div
+    id="mobile-menu"
+    class="fixed inset-0 bg-white z-[105] translate-x-full transition-transform duration-300 md:hidden pt-24 px-6 overflow-y-auto"
+  >
     <nav class="flex flex-col gap-6">
-      <a href="/" class="text-2xl font-bold text-slate-900 border-b pb-4">Home</a>
-      
-      <div class="flex flex-col gap-4">
-        <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Our Services</p>
-        <div class="grid grid-cols-1 gap-3">
-          {services.map((s) => (
-            <a href={`/services/${s.slug.current}`} class="text-lg font-semibold text-slate-700 hover:text-blue-600 pl-2 border-l-2 border-blue-100">
-              {s.title}
-            </a>
-          ))}
-        </div>
-      </div>
-      
-      <a href="#rates" class="text-2xl font-bold text-slate-900 border-b pb-4 pt-2">Rates</a>
+      {
+        navLinks.map((item) => (
+          <a href={item.link} class="text-2xl font-bold text-slate-900 border-b pb-4">
+            {item.label}
+          </a>
+        ))
+      }
 
-      <div class="mt-8">
-         <a href={`https://wa.me/${settings?.whatsappNumber || settings?.ctaValue}`} class="w-full flex bg-green-600 text-white py-4 rounded-xl font-bold justify-center items-center gap-3">
-            <MessageSquare size={24} />
-            Chat on WhatsApp
-         </a>
+      <div class="flex flex-col gap-4">
+        <p class="text-xs font-black text-blue-600 uppercase tracking-widest">Our Services</p>
+        <div class="grid grid-cols-1 gap-3">
+          {
+            services.map((s) => (
+              <a
+                href={`/services/${s.slug.current}`}
+                class="text-lg font-semibold text-slate-700 pl-2 border-l-2 border-blue-100"
+              >
+                {s.title}
+              </a>
+            ))
+          }
+        </div>
       </div>
     </nav>
   </div>
@@ -104,28 +126,10 @@ const services = await sanityClient.fetch(`*[_type == "service"] | order(order a
 
     menuBtn.addEventListener('click', () => {
       const isClosed = mobileMenu.classList.contains('translate-x-full');
-      
-      if (!isClosed) {
-        mobileMenu.classList.add('translate-x-full');
-        hamburgerIcon?.classList.remove('hidden');
-        closeIcon?.classList.add('hidden');
-        document.body.style.overflow = ''; 
-      } else {
-        mobileMenu.classList.remove('translate-x-full');
-        hamburgerIcon?.classList.add('hidden');
-        closeIcon?.classList.remove('hidden');
-        document.body.style.overflow = 'hidden'; 
-      }
-    });
-
-    const navLinks = mobileMenu.querySelectorAll('a');
-    navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        mobileMenu.classList.add('translate-x-full');
-        hamburgerIcon?.classList.remove('hidden');
-        closeIcon?.classList.add('hidden');
-        document.body.style.overflow = '';
-      });
+      mobileMenu.classList.toggle('translate-x-full');
+      hamburgerIcon?.classList.toggle('hidden');
+      closeIcon?.classList.toggle('hidden');
+      document.body.style.overflow = isClosed ? 'hidden' : '';
     });
   }
 

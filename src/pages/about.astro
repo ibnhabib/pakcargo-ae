@@ -1,0 +1,132 @@
+---
+import { sanityClient } from 'sanity:client';
+import Layout from '../layouts/Layout.astro';
+import { Truck, ShieldCheck, Globe2, Award, Users, Anchor } from 'lucide-react';
+
+const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+
+const stats = [
+  { label: 'Years Experience', value: '15+', icon: Award },
+  { label: 'Cargo Moved', value: '500k+ Tons', icon: Truck },
+  { label: 'Satisfied Clients', value: '10k+', icon: Users },
+  { label: 'Destinations', value: 'Pakistan-Wide', icon: Globe2 },
+];
+---
+
+<Layout
+  title={`About Us | ${settings?.businessName || 'PakCargo.ae'}`}
+  description="Learn why PakCargo.ae is the leading choice for shipping from UAE to Pakistan. Experts in Jebel Ali logistics and customs clearance."
+>
+  <main class="bg-white">
+    <section class="relative py-24 bg-slate-900 overflow-hidden">
+      <div class="absolute inset-0 opacity-20">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-600 to-transparent"></div>
+      </div>
+      <div class="relative z-10 max-w-6xl mx-auto px-6 text-center">
+        <span class="text-blue-400 font-bold uppercase tracking-widest text-sm mb-4 block"
+          >Our Legacy</span
+        >
+        <h1 class="text-4xl md:text-7xl font-black text-white mb-6">
+          Connecting the UAE <br /><span class="text-blue-500">to Pakistan</span>
+        </h1>
+        <p class="text-slate-300 text-lg max-w-3xl mx-auto leading-relaxed">
+          Based in the heart of the UAE's logistics hub, {settings?.businessName || 'PakCargo.ae'} was
+          founded to bridge the gap between Dubai's global trade and Pakistan's growing demand for reliable
+          door-to-door delivery.
+        </p>
+      </div>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-6 -mt-12 relative z-20">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {
+          stats.map((stat) => (
+            <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-center transform hover:-translate-y-1 transition-all">
+              <div class="flex justify-center mb-4 text-blue-600">
+                <stat.icon size={32} />
+              </div>
+              <div class="text-3xl font-black text-slate-900 mb-1">{stat.value}</div>
+              <div class="text-sm font-medium text-slate-500 uppercase tracking-tighter">
+                {stat.label}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="py-24 max-w-6xl mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="text-3xl md:text-5xl font-black text-slate-900 mb-8 italic leading-tight">
+            Managing the Flow of <span class="text-blue-600 underline">Pakistan Trade</span>
+          </h2>
+          <div class="space-y-6 text-slate-600 text-lg leading-relaxed">
+            <p>
+              Operating primarily from **Jebel Ali**, we specialize in the complex logistics of sea
+              freight and the speed of air cargo. We don't just ship boxes; we manage the entire
+              supply chain from your doorstep in Dubai or Abu Dhabi to the final destination in
+              Pakistan.
+            </p>
+            <p>
+              Our deep understanding of **FBR customs regulations** and Pakistan's city-specific
+              delivery networks ensures your cargo is cleared quickly and delivered safely.
+            </p>
+          </div>
+
+          <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100"
+            >
+              <Anchor class="text-blue-600" size={20} />
+              <span class="font-bold text-slate-800">Sea Freight Experts</span>
+            </div>
+            <div
+              class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100"
+            >
+              <ShieldCheck class="text-blue-600" size={20} />
+              <span class="font-bold text-slate-800">Licensed Operations</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="aspect-square bg-slate-200 rounded-[3rem] overflow-hidden shadow-2xl">
+            <img
+              src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800"
+              alt="Logistics Warehouse Operations"
+              class="w-full h-full object-cover"
+            />
+          </div>
+          <div
+            class="absolute -bottom-6 -left-6 bg-white p-8 rounded-3xl shadow-xl border border-slate-100 max-w-xs"
+          >
+            <p class="text-slate-600 text-sm italic font-medium">
+              "Our mission is to provide the most transparent and stress-free cargo service in the
+              region."
+            </p>
+            <p class="mt-4 font-bold text-slate-900">— Leadership Team</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-20 px-6 bg-blue-600 text-center rounded-t-[4rem]">
+      <h2 class="text-3xl md:text-5xl font-black text-white mb-8">Ready to move your Cargo?</h2>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a
+          href="/contact"
+          class="bg-white text-blue-600 px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-100 transition-all shadow-xl"
+        >
+          Visit Our Office
+        </a>
+        <a
+          href={`https://wa.me/${settings?.whatsappNumber}`}
+          class="bg-green-500 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-green-600 transition-all shadow-xl"
+        >
+          Get Instant Quote
+        </a>
+      </div>
+    </section>
+  </main>
+</Layout>

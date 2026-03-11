@@ -1,0 +1,50 @@
+---
+import { sanityClient } from "sanity:client";
+
+// Fetch global settings for the domain (Title, Meta, Favicon)
+const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+
+const { 
+  title, 
+  description, 
+  image = "/og-image.jpg", // Default social sharing image
+  canonicalURL = Astro.url 
+} = Astro.props;
+
+// Use the dynamic title from Sanity if none is provided in the page
+const metaTitle = title || settings?.title || "Cargo to Pakistan | Professional Logistics";
+const metaDescription = description || settings?.description || "Reliable cargo services from UAE to Pakistan.";
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<meta name="generator" content={Astro.generator} />
+
+<link rel="canonical" href={canonicalURL} />
+
+<title>{metaTitle}</title>
+<meta name="title" content={metaTitle} />
+<meta name="description" content={metaDescription} />
+
+<meta property="og:type" content="website" />
+<meta property="og:url" content={Astro.url} />
+<meta property="og:title" content={metaTitle} />
+<meta property="og:description" content={metaDescription} />
+<meta property="og:image" content={new URL(image, Astro.url)} />
+
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={Astro.url} />
+<meta property="twitter:title" content={metaTitle} />
+<meta property="twitter:description" content={metaDescription} />
+<meta property="twitter:image" content={new URL(image, Astro.url)} />
+
+{settings?.gtmId && (
+  <script is:inline define:vars={{ id: settings.gtmId }}>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer',id);
+  </script>
+)}

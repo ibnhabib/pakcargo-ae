@@ -1,0 +1,36 @@
+---
+import { sanityClient } from 'sanity:client';
+import Layout from '../layouts/Layout.astro';
+import PortableText from '../components/PortableText.astro';
+
+export async function getStaticPaths() {
+  const pages = await sanityClient.fetch(`*[_type == "page"]`);
+  return pages.map((page: any) => ({
+    params: { slug: page.slug.current },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props;
+
+if (!page) {
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title={`${page.seoTitle || page.title}`} description={page.metaDescription}>
+  <main class="relative pt-32 pb-20 bg-slate-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-6">
+      <header class="mb-12">
+        <h1 class="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight">
+          {page.title}
+        </h1>
+        <div class="h-1.5 w-20 bg-blue-600 rounded-full"></div>
+      </header>
+
+      <article class="bg-white p-8 md:p-16 rounded-[2.5rem] shadow-sm border border-slate-100">
+        <PortableText value={page.content} />
+      </article>
+    </div>
+  </main>
+</Layout>

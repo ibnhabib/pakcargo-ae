@@ -8,8 +8,8 @@ import post from './post'
 import faqItem from './objects/faqItem'
 import homepage from './homepage'
 import contactChannel from './contactChannel'
-// NEW: Import blockContent for Rich Text support
 import blockContent from './blockContent'
+import page from './page'
 
 export const schemaTypes = [
   // Settings & Global
@@ -22,6 +22,7 @@ export const schemaTypes = [
   rateCard,
 
   // Blog & Content
+  page,
   post,
   author,
 
@@ -31,5 +32,5 @@ export const schemaTypes = [
 
   // Reusable Objects
   faqItem,
-  blockContent, // Added here to enable Portable Text editing
+  blockContent,
 ]

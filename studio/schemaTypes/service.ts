@@ -31,8 +31,7 @@ export default defineType({
       title: 'SEO Optimized Title',
       type: 'string',
       group: 'seo',
-      description:
-        'CRITICAL: Target high-volume keywords (e.g., Sea Cargo to Pakistan from Dubai | Door to Door).',
+      description: 'CRITICAL: Target high-volume keywords.',
       validation: (Rule) => Rule.max(60).warning('Keep under 60 characters for Google.'),
     }),
     defineField({
@@ -57,7 +56,6 @@ export default defineType({
           name: 'alt',
           type: 'string',
           title: 'Alternative Text',
-          description: 'Describe for SEO (e.g., Loading Sea Cargo to Pakistan).',
         },
       ],
     }),
@@ -73,7 +71,6 @@ export default defineType({
       title: 'Schema Service Category',
       type: 'string',
       group: 'seo',
-      description: 'Helps Google AI categorize your business entity.',
       options: {
         list: [
           {title: 'Sea Freight', value: 'SeaFreight'},
@@ -88,7 +85,31 @@ export default defineType({
       title: 'Starting Price (AED)',
       type: 'string',
       group: 'content',
-      description: 'e.g., "1.50" or "500". Used for Price Schema.',
+    }),
+    // ADDED: The Dynamic Rate Table Field
+    defineField({
+      name: 'rateTable',
+      title: 'Service Rate Table',
+      type: 'array',
+      group: 'content',
+      description: 'List specific items and their prices (e.g., TV, Refrigerator, or Per KG).',
+      of: [
+        {
+          type: 'object',
+          name: 'rateRow',
+          fields: [
+            {name: 'item', title: 'Item Name', type: 'string', description: 'e.g., LED TV 55"'},
+            {name: 'unit', title: 'Unit', type: 'string', description: 'e.g., Per Piece, Per KG'},
+            {name: 'price', title: 'Price (AED)', type: 'string', description: 'e.g., 250'},
+            {
+              name: 'note',
+              title: 'Special Note',
+              type: 'string',
+              description: 'e.g., Customs included',
+            },
+          ],
+        },
+      ],
     }),
     defineField({
       name: 'description',
@@ -96,7 +117,6 @@ export default defineType({
       type: 'text',
       group: 'content',
       rows: 3,
-      description: 'The brief summary for homepage cards.',
     }),
     defineField({
       name: 'keyFeatures',
@@ -104,25 +124,20 @@ export default defineType({
       type: 'array',
       group: 'content',
       of: [{type: 'string'}],
-      description: 'e.g., "Free home pickup", "Customs clearance included"',
     }),
     defineField({
       name: 'serviceableAreas',
       title: 'Local Neighborhoods (Near Me Optimization)',
       type: 'array',
       group: 'local',
-      description: 'CRITICAL: Add specific areas (e.g., Deira, Al Quoz, Musaffah, JVC).',
       of: [{type: 'string'}],
-      options: {
-        layout: 'tags',
-      },
+      options: {layout: 'tags'},
     }),
     defineField({
       name: 'metaDescription',
       title: 'Meta Description',
       type: 'text',
       group: 'seo',
-      description: 'Search snippet (120-160 chars).',
       validation: (Rule) => Rule.min(120).max(160),
     }),
     defineField({
@@ -138,7 +153,6 @@ export default defineType({
       type: 'array',
       group: 'seo',
       of: [{type: 'faqItem'}],
-      description: 'Add FAQs related specifically to this service for better ranking.',
     }),
   ],
   preview: {
