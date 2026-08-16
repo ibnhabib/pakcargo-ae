@@ -1,36 +1,23 @@
 ---
 import { sanityClient } from 'sanity:client';
 import Layout from '../../layouts/Layout.astro';
-import { urlFor } from '../../lib/sanity';
+import { urlFor, getSiteSettings } from '../../lib/sanity';
+import { SERVICES_WITH_DETAILS_QUERY } from '../../lib/queries';
 import PortableText from '../../components/PortableText.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import { Ship, Plane, FileText, Home, Package, Truck, MapPin, CheckCircle2 } from 'lucide-react';
 import RatesTable from '../../components/RatesTable.astro';
 
 export async function getStaticPaths() {
-  const services = await sanityClient.fetch(`*[_type == "service"]`);
+  const services = await sanityClient.fetch(SERVICES_WITH_DETAILS_QUERY);
   return services.map((service) => ({
     params: { slug: service.slug.current },
     props: { service },
   }));
 }
 
-const { slug } = Astro.params;
-const service = await sanityClient.fetch(
-  `*[_type == "service" && slug.current == $slug][0]{
-    ...,
-    rateTable,
-    faqs[] {
-      question,
-      atomicAnswer,
-      detailedAnswer,
-      lastReviewed
-    }
-  }`,
-  { slug }
-);
-
-const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+const { service } = Astro.props;
+const settings = await getSiteSettings();
 
 const iconMap = {
   ship: Ship,
@@ -106,7 +93,7 @@ const combinedSchema = {
   description={service.metaDescription || service.description}
   ogImage={service.mainImage}
 >
-  <script type="application/ld+json" set:html={JSON.stringify(combinedSchema)} slot="head" />
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(combinedSchema)} slot="head" />
 
   <main class="bg-slate-50 min-h-screen">
     <section class="relative h-[50vh] min-h-[400px] flex items-center overflow-hidden bg-slate-900">
@@ -162,17 +149,7 @@ const combinedSchema = {
           </h2>
           <PortableText value={service.details} />
 
-          // ... inside your HTML template
-          <div
-            class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100"
-          >
-            <h2 class="text-3xl font-bold text-slate-900 mb-6 italic">
-              Reliable {service.title} Solution
-            </h2>
-            <PortableText value={service.details} />
-
-            <RatesTable rates={service.rateTable} serviceTitle={service.title} />
-          </div>
+          <RatesTable rates={service.rateTable} serviceTitle={service.title} />
         </div>
 
         {
@@ -191,7 +168,7 @@ const combinedSchema = {
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {service.serviceableAreas.map((area) => (
                   <div class="flex items-center gap-2 p-3 bg-white/10 rounded-xl border border-white/10 hover:bg-white/20 transition-colors">
-                    <CheckCircle2 size={14} class="text-blue-300" />
+                    <CheckCircle2 size={14} className="text-blue-300" />
                     <span class="text-sm font-semibold">{area}</span>
                   </div>
                 ))}

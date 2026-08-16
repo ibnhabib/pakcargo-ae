@@ -6,8 +6,8 @@ import {schemaTypes} from './schemaTypes'
 export default defineConfig({
   name: 'default',
   title: 'PakCargo Admin',
-  projectId: '9volnp47',
-  dataset: 'production',
+  projectId: import.meta.env.SANITY_STUDIO_PROJECT_ID || '9volnp47',
+  dataset: import.meta.env.SANITY_STUDIO_DATASET || 'production',
 
   plugins: [
     structureTool({

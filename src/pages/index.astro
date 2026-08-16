@@ -2,84 +2,30 @@
 import Layout from '../layouts/Layout.astro';
 import BlogSection from '../components/BlogSection.astro';
 import { sanityClient } from 'sanity:client';
-import { urlFor } from '../lib/sanity';
 import PriceGrid from '../components/PriceGrid.astro';
 import ServiceSection from '../components/ServiceSection.astro';
 import Hero from '../components/Hero.astro';
 import TrustSection from '../components/TrustSection.astro';
 import PartnerLogos from '../components/PartnerLogos.astro';
 import FaqSection from '../components/FaqSection.astro';
+import { getSiteSettings, getServices } from '../lib/sanity';
+import { HOMEPAGE_QUERY, RATE_CARDS_QUERY, TRUST_POINTS_QUERY, PARTNERS_QUERY } from '../lib/queries';
 import { MapPin } from 'lucide-react';
 
-// 1. Optimized GROQ Fetching
-const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+// 1. Optimized GROQ Fetching (memoized - see src/lib/sanity.ts)
+const settings = await getSiteSettings();
 
 // Fetch Homepage data including our new SEO override fields
-const homeData = await sanityClient.fetch(`*[_type == "homepage"][0]{
-  ...,
-  featuredServices[]->,
-  featuredTrustPoints->,
-  featuredPartners[]->,
-  faqs[] {
-    question,
-    atomicAnswer,
-    detailedAnswer,
-    lastReviewed
-  },
-  seoTitle,
-  seoDescription,
-  seoKeywords
-}`);
+const homeData = await sanityClient.fetch(HOMEPAGE_QUERY);
 
-const services =
-  homeData?.featuredServices ||
-  (await sanityClient.fetch(`*[_type == "service"] | order(order asc)`));
-const rates = await sanityClient.fetch(`*[_type == "rateCard"] | order(order asc)`);
-const trustData =
-  homeData?.featuredTrustPoints || (await sanityClient.fetch(`*[_type == "trustPoints"][0]`));
-const partners = homeData?.featuredPartners || (await sanityClient.fetch(`*[_type == "partner"]`));
+const services = homeData?.featuredServices || (await getServices());
+const rates = await sanityClient.fetch(RATE_CARDS_QUERY);
+const trustData = homeData?.featuredTrustPoints || (await sanityClient.fetch(TRUST_POINTS_QUERY));
+const partners = homeData?.featuredPartners || (await sanityClient.fetch(PARTNERS_QUERY));
 
 const serviceAreas = settings?.mainServiceAreas || ['Dubai', 'Abu Dhabi', 'Sharjah'];
 
-// 2. Advanced JSON-LD Schema
-const businessSchema = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'LogisticsCompany',
-      '@id': `${settings?.siteUrl || 'https://pakcargo.ae'}/#organization`,
-      name: settings?.businessName || 'PakCargo.ae',
-      legalName: settings?.legalName,
-      taxID: settings?.tradeLicense,
-      url: settings?.siteUrl || 'https://pakcargo.ae',
-      logo: `${settings?.siteUrl || 'https://pakcargo.ae'}/favicon.svg`,
-      image: settings?.ogImage
-        ? urlFor(settings.ogImage).width(1200).url()
-        : `${settings?.siteUrl || 'https://pakcargo.ae'}/og-image.jpg`,
-      telephone: settings?.phone,
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: settings?.address,
-        addressLocality: 'Dubai',
-        addressCountry: 'AE',
-      },
-      geo: settings?.geoCoordinates
-        ? {
-            '@type': 'GeoCoordinates',
-            latitude: settings.geoCoordinates.lat,
-            longitude: settings.geoCoordinates.lng,
-          }
-        : undefined,
-      areaServed: [
-        ...serviceAreas.map((city) => ({ '@type': 'City', name: city })),
-        { '@type': 'Country', name: 'Pakistan' },
-      ],
-      knowsAbout: homeData?.seoKeywords ||
-        settings?.keywords || ['pakistan cargo', 'cargo to pakistan'],
-    },
-  ],
-};
-
+// Organization/LocalBusiness JSON-LD is emitted globally by LocalBusinessSchema.astro (via Layout).
 const faqSchema = homeData?.faqs
   ? {
       '@context': 'https://schema.org',
@@ -87,7 +33,7 @@ const faqSchema = homeData?.faqs
       mainEntity: homeData.faqs.map((faq) => ({
         '@type': 'Question',
         name: faq.question,
-        acceptedAnswer: { '@type': 'Answer', text: faq.atomicAnswer || faq.answer },
+        acceptedAnswer: { '@type': 'Answer', text: faq.atomicAnswer },
       })),
     }
   : null;
@@ -98,8 +44,7 @@ const faqSchema = homeData?.faqs
   description={homeData?.seoDescription}
   keywords={homeData?.seoKeywords}
 >
-  <script type="application/ld+json" set:html={JSON.stringify(businessSchema)} />
-  {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
+  {faqSchema && <script is:inline type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 
   <Hero title={homeData?.heroTitle} subtitle={homeData?.heroSubtitle} />
 

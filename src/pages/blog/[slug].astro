@@ -1,12 +1,13 @@
 ---
 import { sanityClient } from 'sanity:client';
 import Layout from '../../layouts/Layout.astro';
-import { urlFor } from '../../lib/sanity';
+import { urlFor, getSiteSettings } from '../../lib/sanity';
+import { BLOG_POST_SLUGS_QUERY, AUTHOR_BY_ID_QUERY } from '../../lib/queries';
 import { PortableText } from 'astro-portabletext';
-import { Clock, UserCheck, ShieldCheck } from 'lucide-react';
+import { UserCheck, ShieldCheck } from 'lucide-react';
 
 export async function getStaticPaths() {
-  const posts = await sanityClient.fetch(`*[_type == "post"]`);
+  const posts = await sanityClient.fetch(BLOG_POST_SLUGS_QUERY);
   return posts.map((post) => ({
     params: { slug: post.slug.current },
     props: { post },
@@ -15,16 +16,8 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 
-// Optimized Fetch: Get Author and Settings in one go
-const data = await sanityClient.fetch(
-  `{
-  "author": *[_type == "author" && _id == $authorRef][0],
-  "settings": *[_type == "siteSettings"][0]
-}`,
-  { authorRef: post.author?._ref }
-);
-
-const { author, settings } = data;
+const author = await sanityClient.fetch(AUTHOR_BY_ID_QUERY, { authorRef: post.author?._ref });
+const settings = await getSiteSettings();
 
 const faqSchema = post.faqs
   ? {
@@ -33,7 +26,7 @@ const faqSchema = post.faqs
       mainEntity: post.faqs.map((faq) => ({
         '@type': 'Question',
         name: faq.question,
-        acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+        acceptedAnswer: { '@type': 'Answer', text: faq.atomicAnswer },
       })),
     }
   : null;
@@ -126,7 +119,7 @@ const faqSchema = post.faqs
           </p>
           <div class="space-y-4">
             <a
-              href={`https://wa.me/${settings?.ctaValue}`}
+              href={`https://wa.me/${settings?.whatsappNumber}`}
               class="flex items-center justify-center gap-3 py-5 bg-white text-blue-600 font-black rounded-2xl hover:scale-105 transition-transform"
             >
               WhatsApp Us
@@ -143,5 +136,5 @@ const faqSchema = post.faqs
     </div>
   </article>
 
-  {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
+  {faqSchema && <script is:inline type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 </Layout>

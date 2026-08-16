@@ -1,14 +1,13 @@
 ---
-import { MessageSquare, Phone, MapPin, Plus, X, Globe, MessageCircle } from 'lucide-react';
+import { MessageSquare, Phone, Plus, X, Globe, MessageCircle } from 'lucide-react';
 import { sanityClient } from "sanity:client";
+import { ACTIVE_CONTACT_CHANNELS_QUERY } from '../lib/queries';
 
 /**
  * Fetch all active contact channels.
  * We now pull embedCode for Yeastar Live Chat snippets.
  */
-const channels = await sanityClient.fetch(`
-  *[_type == "contactChannel" && isActive == true] | order(priority asc)
-`);
+const channels = await sanityClient.fetch(ACTIVE_CONTACT_CHANNELS_QUERY);
 
 const scriptChannels = channels.filter(c => c.embedCode);
 

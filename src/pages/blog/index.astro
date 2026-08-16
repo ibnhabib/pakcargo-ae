@@ -2,18 +2,10 @@
 import { sanityClient } from 'sanity:client';
 import Layout from '../../layouts/Layout.astro';
 import { urlFor } from '../../lib/sanity';
+import { BLOG_POSTS_LIST_QUERY } from '../../lib/queries';
 
 // 1. Fetch all blog posts from Sanity (Ordered by Date)
-const posts = await sanityClient.fetch(`
-  *[_type == "post"] | order(publishedAt desc) {
-    title,
-    slug,
-    mainImage,
-    publishedAt,
-    metaDescription,
-    "authorName": author->name
-  }
-`);
+const posts = await sanityClient.fetch(BLOG_POSTS_LIST_QUERY);
 
 // 2. Identify the "Featured Post" (the most recent one)
 const featuredPost = posts[0];

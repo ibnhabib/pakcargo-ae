@@ -97,15 +97,7 @@ export default defineType({
       type: 'array',
       group: 'content', // Moved to content for better visual flow in Studio
       description: 'General questions to rank for broad UAE-Pakistan search terms.',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {name: 'question', type: 'string'},
-            {name: 'answer', type: 'text'},
-          ],
-        },
-      ],
+      of: [{type: 'faqItem'}],
     }),
     defineField({
       name: 'footerText',

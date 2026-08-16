@@ -1,0 +1,10 @@
+---
+const { node, index, isInline, ...attrs } = Astro.props;
+---
+
+<blockquote
+  class="border-l-8 border-blue-600 pl-8 my-10 py-4 bg-blue-50/80 rounded-r-3xl text-slate-800 italic text-2xl font-medium leading-snug"
+  {...attrs}
+>
+  <slot />
+</blockquote>

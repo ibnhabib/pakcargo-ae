@@ -1,8 +1,8 @@
 ---
-import { sanityClient } from "sanity:client";
 import { ShieldCheck, Truck, Clock, Phone, MessageSquare } from 'lucide-react';
+import { getSiteSettings } from '../lib/sanity';
 
-const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+const settings = await getSiteSettings();
 ---
 
 <section class="relative bg-white pt-10 md:pt-16 pb-12 overflow-hidden w-full">
@@ -20,7 +20,7 @@ const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
 
         <div class="flex flex-col sm:flex-row gap-4 mb-10">
           <a 
-            href={`https://wa.me/${settings?.whatsappNumber || settings?.ctaValue}`} 
+            href={`https://wa.me/${settings?.whatsappNumber}`}
             class="inline-flex items-center justify-center gap-3 px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-bold text-lg rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             <MessageSquare size={22} />
@@ -50,21 +50,21 @@ const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
 
     <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-slate-100 pt-10">
       <div class="flex items-center gap-4 text-slate-700">
-        <ShieldCheck class="text-blue-600" size={32} />
+        <ShieldCheck className="text-blue-600" size={32} />
         <div>
           <p class="font-bold">100% Secure</p>
           <p class="text-sm text-slate-500">Fully insured</p>
         </div>
       </div>
       <div class="flex items-center gap-4 text-slate-700">
-        <Truck class="text-blue-600" size={32} />
+        <Truck className="text-blue-600" size={32} />
         <div>
           <p class="font-bold">Door Delivery</p>
           <p class="text-sm text-slate-500">Every city in Pakistan</p>
         </div>
       </div>
       <div class="flex items-center gap-4 text-slate-700">
-        <Clock class="text-blue-600" size={32} />
+        <Clock className="text-blue-600" size={32} />
         <div>
           <p class="font-bold">Fast Tracking</p>
           <p class="text-sm text-slate-500">Real-time updates</p>

@@ -1,0 +1,22 @@
+---
+import { urlFor } from '../../lib/sanity';
+
+const { node } = Astro.props;
+const imageUrl = urlFor(node).width(1200).auto('format').url();
+---
+
+<figure class="my-10 overflow-hidden rounded-3xl border border-slate-200 shadow-xl">
+  <img
+    src={imageUrl}
+    alt={node.alt || 'Pakistan Cargo Logistics Details'}
+    loading="lazy"
+    class="w-full h-auto object-cover"
+  />
+  {
+    node.alt && (
+      <figcaption class="bg-slate-50 px-6 py-3 text-sm text-slate-500 italic border-t border-slate-100 font-medium">
+        {node.alt}
+      </figcaption>
+    )
+  }
+</figure>

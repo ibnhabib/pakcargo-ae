@@ -9,8 +9,8 @@ import {defineCliConfig} from 'sanity/cli'
 
 export default defineCliConfig({
   api: {
-    projectId: '9volnp47',
-    dataset: 'production',
+    projectId: process.env.SANITY_STUDIO_PROJECT_ID || '9volnp47',
+    dataset: process.env.SANITY_STUDIO_DATASET || 'production',
   },
   deployment: {
     appId: 'lmbfpb24flkxjssmf2jcbjj1', // Added missing comma here
@@ -20,5 +20,10 @@ export default defineCliConfig({
      * Learn more at https://www.sanity.io/docs/studio/latest-version-of-sanity
      */
     autoUpdates: true,
+  },
+  typegen: {
+    path: '../src/**/*.ts',
+    schema: './schema.json',
+    generates: '../src/sanity.types.ts',
   },
 })

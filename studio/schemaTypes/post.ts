@@ -32,6 +32,14 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'publishedAt',
+      title: 'Published Date',
+      type: 'datetime',
+      group: 'content',
+      initialValue: () => new Date().toISOString(),
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'author',
       title: 'Expert Author',
       type: 'reference',
@@ -94,15 +102,7 @@ export default defineType({
       title: 'Post FAQs',
       type: 'array',
       group: 'richSnippets',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          fields: [
-            {name: 'question', type: 'string'},
-            {name: 'answer', type: 'text'},
-          ],
-        }),
-      ],
+      of: [defineArrayMember({type: 'faqItem'})],
     }),
   ],
 })

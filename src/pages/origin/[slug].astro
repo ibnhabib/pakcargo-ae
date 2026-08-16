@@ -1,8 +1,7 @@
 ---
-import { sanityClient } from 'sanity:client';
 import Layout from '../../layouts/Layout.astro';
-import { MapPin, Clock, Truck, Ship, Plane, PhoneCall, ShieldCheck } from 'lucide-react';
-import { urlFor } from '../../lib/sanity';
+import { MapPin, Clock, Truck, PhoneCall, ShieldCheck } from 'lucide-react';
+import { getSiteSettings, getServices } from '../../lib/sanity';
 
 export async function getStaticPaths() {
   // Define your main UAE hubs
@@ -31,10 +30,10 @@ export async function getStaticPaths() {
 }
 
 const { hub } = Astro.props;
-const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+const settings = await getSiteSettings();
 
 // Fetch services to show on this local page
-const services = await sanityClient.fetch(`*[_type == "service"][0...3]`);
+const services = ((await getServices()) || []).slice(0, 3);
 
 const originSchema = {
   '@context': 'https://schema.org',
@@ -56,7 +55,7 @@ const originSchema = {
   title={`Cargo to Pakistan from ${hub.name} | Door-to-Door Service`}
   description={`Best rates for shipping from ${hub.name} to Pakistan. Daily pickups in ${hub.areas.join(', ')}. Sea and Air cargo specialists.`}
 >
-  <script type="application/ld+json" set:html={JSON.stringify(originSchema)} slot="head" />
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(originSchema)} slot="head" />
 
   <main>
     <section class="bg-slate-900 py-24 relative overflow-hidden">

@@ -2,11 +2,12 @@
 import { sanityClient } from 'sanity:client';
 import Layout from '../layouts/Layout.astro';
 import PortableText from '../components/PortableText.astro';
+import { PAGE_OR_SERVICE_SLUGS_QUERY } from '../lib/queries';
 import { Table, MapPin, CheckCircle2 } from 'lucide-react';
 
 export async function getStaticPaths() {
   // Fetch both 'page' and 'service' types to generate all URLs
-  const data = await sanityClient.fetch(`*[_type in ["page", "service"]]`);
+  const data = await sanityClient.fetch(PAGE_OR_SERVICE_SLUGS_QUERY);
 
   return data.map((item: any) => ({
     params: { slug: item.slug.current },
@@ -60,7 +61,7 @@ const isService = item._type === 'service';
             isService && item.rateTable && (
               <section class="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl">
                 <div class="flex items-center gap-4 mb-8">
-                  <Table class="text-blue-400" size={32} />
+                  <Table className="text-blue-400" size={32} />
                   <h2 class="text-3xl font-black italic">Latest Shipping Rates</h2>
                 </div>
                 <div class="overflow-x-auto">
@@ -96,7 +97,7 @@ const isService = item._type === 'service';
             isService && item.keyFeatures && (
               <div class="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm">
                 <h3 class="text-xl font-black mb-6 flex items-center gap-2">
-                  <CheckCircle2 class="text-green-500" /> Key Features
+                  <CheckCircle2 className="text-green-500" /> Key Features
                 </h3>
                 <ul class="space-y-4">
                   {item.keyFeatures.map((feature: string) => (

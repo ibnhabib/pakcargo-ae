@@ -1,11 +1,13 @@
 ---
-import { sanityClient } from 'sanity:client';
 import Layout from '../../layouts/Layout.astro';
+import { getSiteSettings, getServices } from '../../lib/sanity';
 import { Ship, Plane, FileText, Home, Package, Truck, MapPin } from 'lucide-react';
 
-// 1. Fetch data from Sanity
-const services = await sanityClient.fetch(`*[_type == "service"] | order(title asc)`);
-const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+// 1. Fetch data from Sanity (memoized - see src/lib/sanity.ts)
+const services = [...((await getServices()) || [])].sort((a, b) =>
+  a.title.localeCompare(b.title)
+);
+const settings = await getSiteSettings();
 
 // 2. Icon Mapping
 const iconMap = {
@@ -135,6 +137,6 @@ const breadcrumbSchema = {
     </div>
   </main>
 
-  <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
 </Layout>

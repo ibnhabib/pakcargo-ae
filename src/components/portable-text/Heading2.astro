@@ -1,0 +1,11 @@
+---
+const { node, index, isInline, ...attrs } = Astro.props;
+---
+
+<h2
+  class="text-3xl md:text-4xl font-black text-slate-900 mt-16 mb-6 tracking-tight flex items-center gap-3"
+  {...attrs}
+>
+  <span class="w-8 h-1 bg-blue-600 rounded-full"></span>
+  <slot />
+</h2>

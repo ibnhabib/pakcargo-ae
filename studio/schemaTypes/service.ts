@@ -165,15 +165,7 @@ export default defineType({
       title: 'Service-Specific FAQs',
       type: 'array',
       group: 'seo',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {name: 'question', type: 'string'},
-            {name: 'answer', type: 'text'},
-          ],
-        },
-      ],
+      of: [{type: 'faqItem'}],
     }),
   ],
   preview: {

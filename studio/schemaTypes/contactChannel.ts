@@ -40,7 +40,8 @@ export default defineType({
       name: 'embedCode',
       title: 'JS Snippet / HTML Code',
       type: 'text',
-      description: 'Paste your Yeastar Live Chat or custom HTML code here.',
+      description:
+        'Paste your Yeastar Live Chat or custom HTML code here. SECURITY: this renders unsanitized on every page of the live site — only paste code from a source you trust, and restrict who can edit this field to trusted team members.',
       // Only show this for snippets
       hidden: ({parent}) => parent?.platform !== 'livechat' && parent?.platform !== 'custom',
     }),

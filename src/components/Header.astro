@@ -1,16 +1,12 @@
 ---
-import { sanityClient } from 'sanity:client';
 import { Phone, MessageSquare, ChevronDown, Menu, X } from 'lucide-react';
 import Logo from './Logo.astro';
+import { getSiteSettings, getServices } from '../lib/sanity';
 
-// Fetching Global Settings including our new Header Menu
-const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]{
-  ...,
-  headerMenu[]
-}`);
+const settings = await getSiteSettings();
 
 // Fetching Services for the dropdown
-const services = (await sanityClient.fetch(`*[_type == "service"] | order(order asc)`)) || [];
+const services = (await getServices()) || [];
 
 // Safety check for navLinks
 const navLinks = settings?.headerMenu || [];

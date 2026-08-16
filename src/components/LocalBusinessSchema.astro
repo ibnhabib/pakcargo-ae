@@ -1,6 +1,8 @@
 ---
 const { settings } = Astro.props;
 
+const serviceAreas = settings?.mainServiceAreas || ['Dubai', 'Abu Dhabi', 'Sharjah'];
+
 // EXPERT FIX: We use an array for @type to ensure Google validation
 // while keeping the specific LogisticsBusiness classification.
 const schema = {
@@ -11,7 +13,7 @@ const schema = {
   legalName: settings?.legalName,
   url: 'https://pakcargo.ae',
   logo: 'https://pakcargo.ae/favicon.svg',
-  image: settings?.ogImage ? settings.ogImage.asset.url : 'https://pakcargo.ae/og-default.jpg',
+  image: settings?.ogImage?.asset?.url || 'https://pakcargo.ae/og-default.jpg',
   address: {
     '@type': 'PostalAddress',
     streetAddress: settings?.address,
@@ -44,8 +46,13 @@ const schema = {
     },
   ],
   sameAs: settings?.socialLinks || [],
-  identifier: settings?.tradeLicense,
+  taxID: settings?.tradeLicense,
+  areaServed: [
+    ...serviceAreas.map((city: string) => ({ '@type': 'City', name: city })),
+    { '@type': 'Country', name: 'Pakistan' },
+  ],
+  knowsAbout: settings?.keywords || ['pakistan cargo', 'cargo to pakistan'],
 };
 ---
 
-<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />

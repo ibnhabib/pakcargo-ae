@@ -1,7 +1,7 @@
 ---
-import { sanityClient } from 'sanity:client';
 import Layout from '../../layouts/Layout.astro';
-import { MapPin, Clock, ShieldCheck, Box, Truck, CheckCircle2 } from 'lucide-react';
+import { Clock, ShieldCheck, Box, CheckCircle2 } from 'lucide-react';
+import { getSiteSettings } from '../../lib/sanity';
 
 export async function getStaticPaths() {
   // Define your main Pakistan Destination Hubs
@@ -39,7 +39,7 @@ export async function getStaticPaths() {
 }
 
 const { dest } = Astro.props;
-const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
+const settings = await getSiteSettings();
 
 const destinationSchema = {
   '@context': 'https://schema.org',
@@ -58,7 +58,7 @@ const destinationSchema = {
   title={`Cargo to ${dest.name} from UAE | Door to Door Delivery`}
   description={`Send cargo from Dubai/Abu Dhabi to ${dest.name}. Reliable shipping with customs clearance at ${dest.customsHub}. Covering ${dest.coverage.join(', ')}.`}
 >
-  <script type="application/ld+json" set:html={JSON.stringify(destinationSchema)} slot="head" />
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(destinationSchema)} slot="head" />
 
   <main class="bg-slate-50">
     <section class="bg-blue-900 py-24 relative overflow-hidden">
@@ -124,7 +124,7 @@ const destinationSchema = {
               {
                 dest.coverage.map((area) => (
                   <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <CheckCircle2 size={18} class="text-blue-500 shrink-0" />
+                    <CheckCircle2 size={18} className="text-blue-500 shrink-0" />
                     <span class="font-bold text-slate-800 text-sm">{area}</span>
                   </div>
                 ))

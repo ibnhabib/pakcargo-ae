@@ -2,11 +2,13 @@
 import { sanityClient } from 'sanity:client';
 import Layout from '../layouts/Layout.astro';
 import PortableText from '../components/PortableText.astro';
+import { getSiteSettings, urlFor } from '../lib/sanity';
+import { ABOUT_PAGE_QUERY } from '../lib/queries';
 import { Truck, ShieldCheck, Globe2, Award, Users, Anchor } from 'lucide-react';
 
 // Fetch global settings and the specific About page document
-const settings = await sanityClient.fetch(`*[_type == "siteSettings"][0]`);
-const aboutData = await sanityClient.fetch(`*[_id == "about-us"][0]`);
+const settings = await getSiteSettings();
+const aboutData = await sanityClient.fetch(ABOUT_PAGE_QUERY);
 
 const stats = [
   { label: 'Years Experience', value: aboutData?.yearsExp || '15+', icon: Award },
@@ -94,13 +96,13 @@ const stats = [
             <div
               class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100"
             >
-              <Anchor class="text-blue-600" size={20} />
+              <Anchor className="text-blue-600" size={20} />
               <span class="font-bold text-slate-800">Sea Freight Experts</span>
             </div>
             <div
               class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100"
             >
-              <ShieldCheck class="text-blue-600" size={20} />
+              <ShieldCheck className="text-blue-600" size={20} />
               <span class="font-bold text-slate-800">Licensed Operations</span>
             </div>
           </div>

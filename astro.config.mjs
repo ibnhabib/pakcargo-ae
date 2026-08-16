@@ -18,12 +18,16 @@ export default defineConfig({
   site: 'https://pakcargo.ae',
 
   integrations: [
-    // 2. SANITY: Connects to your project 9volnp47
+    // 2. SANITY: Connects to your project (configured via .env)
     sanity({
-      projectId: '9volnp47',
-      dataset: 'production',
-      useCdn: false, // Set to true for faster production reads in the UAE
-    }), 
+      projectId: process.env.PUBLIC_SANITY_PROJECT_ID || '9volnp47',
+      dataset: process.env.PUBLIC_SANITY_DATASET || 'production',
+      // Uncached, always-fresh reads by default. Set PUBLIC_SANITY_USE_CDN=true in .env
+      // for faster/cheaper cached reads once eventual consistency (~60s) is acceptable.
+      useCdn: process.env.PUBLIC_SANITY_USE_CDN === 'true',
+      // Only needed for a private dataset or to raise API rate limits; unset by default.
+      token: process.env.SANITY_API_READ_TOKEN || undefined,
+    }),
 
     // 3. REACT: Required for any interactive UI components
     react(), 

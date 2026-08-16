@@ -132,10 +132,24 @@ export default defineType({
       group: 'business',
     }),
     defineField({
+      name: 'legalName',
+      title: 'Registered Legal Name',
+      type: 'string',
+      group: 'business',
+      description: 'The full legal entity name as it appears on the trade license, if different from the business name.',
+    }),
+    defineField({
       name: 'address',
       title: 'Warehouse/Office Address',
       type: 'string',
       group: 'business',
+    }),
+    defineField({
+      name: 'geoCoordinates',
+      title: 'Warehouse/Office Geo-Coordinates',
+      type: 'geopoint',
+      group: 'business',
+      description: 'Pin the exact location for LocalBusiness structured data (map lookup available).',
     }),
     defineField({
       name: 'mainServiceAreas',

@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "pakcargo-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 4321,
+      "autoPort": true
+    },
+    {
+      "name": "pakcargo-studio",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "studio", "run", "dev"],
+      "port": 3333,
+      "autoPort": true
+    }
+  ]
+}
