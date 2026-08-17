@@ -999,106 +999,42 @@ export type PARTNERS_QUERY_RESULT = Array<{
 }>;
 
 // Source: ../src/lib/queries.ts
-// Variable: PAGE_OR_SERVICE_SLUGS_QUERY
-// Query: *[_type in ["page", "service"]]
-export type PAGE_OR_SERVICE_SLUGS_QUERY_RESULT = Array<
-  | {
-      _id: string;
-      _type: 'page';
-      _createdAt: string;
-      _updatedAt: string;
-      _rev: string;
-      title?: string;
-      slug?: Slug;
-      subtitle?: string;
-      heroTitlePart1?: string;
-      heroTitlePart2?: string;
-      heroDescription?: string;
-      yearsExp?: string;
-      cargoMoved?: string;
-      clientsCount?: string;
-      destinationsText?: string;
-      bodyTitle?: string;
-      bodyTitleAccent?: string;
-      quoteText?: string;
-      quoteAuthor?: string;
-      mainImage?: {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        _type: 'image';
-      };
-      heroTitle?: string;
-      heroSubtitle?: string;
-      workingHours?: string;
-      sidebarTitle?: string;
-      sidebarText?: string;
-      content?: Array<
-        | {
-            children?: Array<{
-              marks?: Array<string>;
-              text?: string;
-              _type: 'span';
-              _key: string;
-            }>;
-            style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal';
-            listItem?: 'bullet' | 'number';
-            markDefs?: Array<{
-              href?: string;
-              _type: 'link';
-              _key: string;
-            }>;
-            level?: number;
-            _type: 'block';
-            _key: string;
-          }
-        | {
-            asset?: SanityImageAssetReference;
-            media?: unknown;
-            hotspot?: SanityImageHotspot;
-            crop?: SanityImageCrop;
-            _type: 'image';
-            _key: string;
-          }
-      >;
-      seoTitle?: string;
-      metaDescription?: string;
-    }
-  | {
-      _id: string;
-      _type: 'service';
-      _createdAt: string;
-      _updatedAt: string;
-      _rev: string;
-      order?: number;
-      title?: string;
-      slug?: Slug;
-      seoTitle?: string;
-      metaDescription?: string;
-      keywords?: Array<string>;
-      serviceType?: 'AirFreight' | 'DeliveryService' | 'MovingCompany' | 'SeaFreight';
-      mainImage?: {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        alt?: string;
-        _type: 'image';
-      };
-      icon?: string;
-      startingPrice?: string;
-      rateTable?: Array<{
-        item?: string;
-        unit?: string;
-        price?: string;
-        note?: string;
-        _type: 'rateRow';
-        _key: string;
-      }>;
-      description?: string;
-      keyFeatures?: Array<string>;
-      details?: Array<{
+// Variable: PAGE_SLUGS_QUERY
+// Query: *[_type == "page"]
+export type PAGE_SLUGS_QUERY_RESULT = Array<{
+  _id: string;
+  _type: 'page';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  subtitle?: string;
+  heroTitlePart1?: string;
+  heroTitlePart2?: string;
+  heroDescription?: string;
+  yearsExp?: string;
+  cargoMoved?: string;
+  clientsCount?: string;
+  destinationsText?: string;
+  bodyTitle?: string;
+  bodyTitleAccent?: string;
+  quoteText?: string;
+  quoteAuthor?: string;
+  mainImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: 'image';
+  };
+  heroTitle?: string;
+  heroSubtitle?: string;
+  workingHours?: string;
+  sidebarTitle?: string;
+  sidebarText?: string;
+  content?: Array<
+    | {
         children?: Array<{
           marks?: Array<string>;
           text?: string;
@@ -1115,15 +1051,19 @@ export type PAGE_OR_SERVICE_SLUGS_QUERY_RESULT = Array<
         level?: number;
         _type: 'block';
         _key: string;
-      }>;
-      serviceableAreas?: Array<string>;
-      faqs?: Array<
-        {
-          _key: string;
-        } & FaqItem
-      >;
-    }
->;
+      }
+    | {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        _type: 'image';
+        _key: string;
+      }
+  >;
+  seoTitle?: string;
+  metaDescription?: string;
+}>;
 
 // Source: ../src/lib/queries.ts
 // Variable: ABOUT_PAGE_QUERY
@@ -1411,7 +1351,7 @@ declare module '@sanity/client' {
     '*[_type == "rateCard"] | order(order asc)': RATE_CARDS_QUERY_RESULT;
     '*[_type == "trustPoints"][0]': TRUST_POINTS_QUERY_RESULT;
     '*[_type == "partner"]': PARTNERS_QUERY_RESULT;
-    '*[_type in ["page", "service"]]': PAGE_OR_SERVICE_SLUGS_QUERY_RESULT;
+    '*[_type == "page"]': PAGE_SLUGS_QUERY_RESULT;
     '*[_type == "page" && _id == "about-us"][0]': ABOUT_PAGE_QUERY_RESULT;
     '*[_type == "page" && _id == "contact"][0]': CONTACT_PAGE_QUERY_RESULT;
     '*[_type == "post"] | order(publishedAt desc) {\n  title,\n  slug,\n  mainImage,\n  publishedAt,\n  metaDescription,\n  "authorName": author->name\n}': BLOG_POSTS_LIST_QUERY_RESULT;

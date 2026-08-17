@@ -43,4 +43,24 @@ export default defineConfig({
 
   // 6. DEPLOYMENT ADAPTER: Configuration for Netlify hosting
   adapter: netlify(),
+
+  // 7. REDIRECTS: Preserve SEO ranking signal from the old root-level service URLs
+  // (e.g. /sea-cargo-to-pakistan), which used to duplicate /services/[slug] before that
+  // was removed. Add an entry here whenever a service slug changes or a new one launches.
+  redirects: {
+    '/sea-cargo-to-pakistan': '/services/sea-cargo-to-pakistan',
+    '/document-courier-to-pakistan': '/services/document-courier-to-pakistan',
+    '/household-goods-cargo': '/services/household-goods-cargo',
+    '/air-cargo-to-pakistan': '/services/air-cargo-to-pakistan',
+
+    // /origin/[city] and /destination/[city] were replaced by combined route pages
+    // (e.g. /dubai-to-karachi-cargo). Redirect each old URL to its closest new match
+    // to preserve ranking signal instead of losing it to a 404.
+    '/origin/dubai': '/dubai-to-karachi-cargo',
+    '/origin/abu-dhabi': '/abu-dhabi-to-karachi-cargo',
+    '/origin/sharjah': '/sharjah-to-karachi-cargo',
+    '/destination/karachi': '/dubai-to-karachi-cargo',
+    '/destination/lahore': '/dubai-to-lahore-cargo',
+    '/destination/islamabad': '/dubai-to-islamabad-cargo',
+  },
 });

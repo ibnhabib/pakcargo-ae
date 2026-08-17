@@ -61,7 +61,9 @@ export const TRUST_POINTS_QUERY = defineQuery(`*[_type == "trustPoints"][0]`);
 
 export const PARTNERS_QUERY = defineQuery(`*[_type == "partner"]`);
 
-export const PAGE_OR_SERVICE_SLUGS_QUERY = defineQuery(`*[_type in ["page", "service"]]`);
+// Generic CMS pages only (About/Contact today, e.g. Privacy/Terms later).
+// Services live exclusively under /services/[slug] - see SERVICES_WITH_DETAILS_QUERY.
+export const PAGE_SLUGS_QUERY = defineQuery(`*[_type == "page"]`);
 
 export const ABOUT_PAGE_QUERY = defineQuery(`*[_type == "page" && _id == "about-us"][0]`);
 
