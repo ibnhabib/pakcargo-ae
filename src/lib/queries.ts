@@ -98,3 +98,18 @@ export const RECENT_POSTS_QUERY = defineQuery(
 export const ACTIVE_CONTACT_CHANNELS_QUERY = defineQuery(
   `*[_type == "contactChannel" && isActive == true] | order(priority asc)`
 );
+
+export const ORIGIN_HUBS_QUERY = defineQuery(`*[_type == "originHub"] | order(order asc){
+  name,
+  "slug": slug.current,
+  pickupAreas
+}`);
+
+export const DESTINATION_HUBS_QUERY = defineQuery(`*[_type == "destinationHub"] | order(order asc){
+  name,
+  "slug": slug.current,
+  province,
+  transitTimeline,
+  coverageAreas,
+  customsHub
+}`);

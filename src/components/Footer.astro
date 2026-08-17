@@ -1,7 +1,7 @@
 ---
 import { MapPin, Phone, MessageSquare, ShieldCheck } from 'lucide-react';
 import Logo from './Logo.astro';
-import { getSiteSettings, getServices } from '../lib/sanity';
+import { getSiteSettings, getServices, getOriginHubs, getDestinationHubs } from '../lib/sanity';
 
 const settings = await getSiteSettings();
 
@@ -11,6 +11,15 @@ const services = [...((await getServices()) || [])].sort((a, b) =>
 
 const serviceAreas = settings?.mainServiceAreas || [];
 const footerLinks = settings?.footerMenu || [];
+
+const originHubs = (await getOriginHubs()) || [];
+const destinationHubs = (await getDestinationHubs()) || [];
+const routes = originHubs.flatMap((origin) =>
+  destinationHubs.map((destination) => ({
+    label: `${origin.name} to ${destination.name}`,
+    href: `/${origin.slug}-to-${destination.slug}-cargo`,
+  }))
+);
 ---
 
 <footer class="bg-slate-900 text-slate-400 pt-20 pb-10 border-t border-slate-800">
@@ -109,6 +118,21 @@ const footerLinks = settings?.footerMenu || [];
       </div>
     </div>
   </div>
+
+  {
+    routes.length > 0 && (
+      <div class="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-800">
+        <p class="text-xs font-bold text-white mb-4 uppercase tracking-wider">Popular Routes</p>
+        <div class="flex flex-wrap gap-x-5 gap-y-2 text-xs">
+          {routes.map((route) => (
+            <a href={route.href} class="hover:text-blue-400 transition-colors">
+              {route.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   <div
     class="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] uppercase tracking-widest font-bold"

@@ -270,6 +270,33 @@ export type Page = {
   metaDescription?: string;
 };
 
+export type DestinationHub = {
+  _id: string;
+  _type: 'destinationHub';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  province?: string;
+  transitTimeline?: string;
+  coverageAreas?: Array<string>;
+  customsHub?: string;
+  order?: number;
+};
+
+export type OriginHub = {
+  _id: string;
+  _type: 'originHub';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  pickupAreas?: Array<string>;
+  order?: number;
+};
+
 export type RateCard = {
   _id: string;
   _type: 'rateCard';
@@ -589,6 +616,8 @@ export type AllSanitySchemaTypes =
   | Author
   | Slug
   | Page
+  | DestinationHub
+  | OriginHub
   | RateCard
   | Service
   | ContactChannel
@@ -1340,6 +1369,27 @@ export type ACTIVE_CONTACT_CHANNELS_QUERY_RESULT = Array<{
   isActive: true;
 }>;
 
+// Source: ../src/lib/queries.ts
+// Variable: ORIGIN_HUBS_QUERY
+// Query: *[_type == "originHub"] | order(order asc){  name,  "slug": slug.current,  pickupAreas}
+export type ORIGIN_HUBS_QUERY_RESULT = Array<{
+  name: string | null;
+  slug: string | null;
+  pickupAreas: Array<string> | null;
+}>;
+
+// Source: ../src/lib/queries.ts
+// Variable: DESTINATION_HUBS_QUERY
+// Query: *[_type == "destinationHub"] | order(order asc){  name,  "slug": slug.current,  province,  transitTimeline,  coverageAreas,  customsHub}
+export type DESTINATION_HUBS_QUERY_RESULT = Array<{
+  name: string | null;
+  slug: string | null;
+  province: string | null;
+  transitTimeline: string | null;
+  coverageAreas: Array<string> | null;
+  customsHub: string | null;
+}>;
+
 // Query TypeMap
 import '@sanity/client';
 declare module '@sanity/client' {
@@ -1359,5 +1409,7 @@ declare module '@sanity/client' {
     '*[_type == "author" && _id == $authorRef][0]': AUTHOR_BY_ID_QUERY_RESULT;
     '*[_type == "post"] | order(order asc, publishedAt desc)[0...3] {\n    title,\n    slug,\n    mainImage,\n    publishedAt,\n    metaDescription,\n    topic\n  }': RECENT_POSTS_QUERY_RESULT;
     '*[_type == "contactChannel" && isActive == true] | order(priority asc)': ACTIVE_CONTACT_CHANNELS_QUERY_RESULT;
+    '*[_type == "originHub"] | order(order asc){\n  name,\n  "slug": slug.current,\n  pickupAreas\n}': ORIGIN_HUBS_QUERY_RESULT;
+    '*[_type == "destinationHub"] | order(order asc){\n  name,\n  "slug": slug.current,\n  province,\n  transitTimeline,\n  coverageAreas,\n  customsHub\n}': DESTINATION_HUBS_QUERY_RESULT;
   }
 }

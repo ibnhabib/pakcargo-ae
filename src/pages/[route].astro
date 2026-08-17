@@ -1,43 +1,15 @@
 ---
+import { sanityClient } from 'sanity:client';
 import Layout from '../layouts/Layout.astro';
 import { MapPin, Clock, ShieldCheck, Truck, PhoneCall, CheckCircle2 } from 'lucide-react';
 import { getSiteSettings, getServices } from '../lib/sanity';
+import { ORIGIN_HUBS_QUERY, DESTINATION_HUBS_QUERY } from '../lib/queries';
 
+// Route pages are the cross-product of every originHub x destinationHub document in Sanity.
+// Add a city in Studio and every combination with the other side gets a page automatically.
 export async function getStaticPaths() {
-  // UAE pickup hubs. Add a new origin here and every destination below gets a route page for it.
-  const origins = [
-    { slug: 'dubai', name: 'Dubai', areas: ['Deira', 'Bur Dubai', 'Al Quoz', 'Jebel Ali', 'International City'] },
-    { slug: 'abu-dhabi', name: 'Abu Dhabi', areas: ['Musaffah', 'Khalifa City', 'Baniyas', 'Mohammed Bin Zayed City'] },
-    { slug: 'sharjah', name: 'Sharjah', areas: ['Al Nahda', 'Rolla', 'Industrial Area', 'Muwaileh'] },
-  ];
-
-  // Pakistan delivery hubs. Add a new destination here and every origin above gets a route page for it.
-  const destinations = [
-    {
-      slug: 'karachi',
-      name: 'Karachi',
-      province: 'Sindh',
-      timeline: '20-25 Days (Sea) / 3-5 Days (Air)',
-      coverage: ['Hyderabad', 'Sukkur', 'Port Qasim', 'SITE Area'],
-      customsHub: 'Karachi Port / KPT',
-    },
-    {
-      slug: 'lahore',
-      name: 'Lahore',
-      province: 'Punjab',
-      timeline: '25-35 Days (Sea) / 5-7 Days (Air)',
-      coverage: ['Gujranwala', 'Sialkot', 'Sheikhupura', 'Kasur', 'Okara'],
-      customsHub: 'Lahore Dry Port',
-    },
-    {
-      slug: 'islamabad',
-      name: 'Islamabad & Rawalpindi',
-      province: 'Punjab/KPK',
-      timeline: '28-38 Days (Sea) / 5-8 Days (Air)',
-      coverage: ['Peshawar', 'Abbottabad', 'Mardan', 'Jhelum', 'Chakwal'],
-      customsHub: 'Islamabad Local Terminal',
-    },
-  ];
+  const origins = await sanityClient.fetch(ORIGIN_HUBS_QUERY);
+  const destinations = await sanityClient.fetch(DESTINATION_HUBS_QUERY);
 
   const routes = [];
   for (const origin of origins) {
@@ -65,7 +37,7 @@ const routeSchema = {
     { '@type': 'City', name: origin.name, containedInPlace: { '@type': 'Country', name: 'United Arab Emirates' } },
     { '@type': 'City', name: destination.name, containedInPlace: { '@type': 'Country', name: 'Pakistan' } },
   ],
-  description: `Door-to-door cargo shipping from ${origin.name}, UAE to ${destination.name}, Pakistan. Pickup across ${origin.areas.join(', ')}, delivery via ${destination.customsHub}.`,
+  description: `Door-to-door cargo shipping from ${origin.name}, UAE to ${destination.name}, Pakistan. Pickup across ${(origin.pickupAreas || []).join(', ')}, delivery via ${destination.customsHub}.`,
 };
 
 const breadcrumbSchema = {
@@ -116,7 +88,7 @@ const breadcrumbSchema = {
             <Clock size={24} />
             <span class="font-black uppercase tracking-widest text-xs">Estimated Transit Time</span>
           </div>
-          <p class="text-2xl font-bold text-slate-900">{destination.timeline}</p>
+          <p class="text-2xl font-bold text-slate-900">{destination.transitTimeline}</p>
           <p class="text-sm text-slate-500 mt-2">Includes customs processing at {destination.customsHub}.</p>
         </div>
         <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
@@ -137,7 +109,7 @@ const breadcrumbSchema = {
         </h2>
         <div class="flex flex-wrap justify-center gap-3">
           {
-            origin.areas.map((area) => (
+            (origin.pickupAreas || []).map((area) => (
               <span class="px-5 py-2 bg-slate-50 border border-slate-200 rounded-full text-slate-700 font-medium text-sm">
                 {area}
               </span>
@@ -156,7 +128,7 @@ const breadcrumbSchema = {
       </p>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {
-          destination.coverage.map((area) => (
+          (destination.coverageAreas || []).map((area) => (
             <div class="flex items-center gap-3 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
               <CheckCircle2 size={18} className="text-blue-500 shrink-0" />
               <span class="font-bold text-slate-800 text-sm">{area}</span>

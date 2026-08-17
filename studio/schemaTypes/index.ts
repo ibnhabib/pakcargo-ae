@@ -10,6 +10,8 @@ import homepage from './homepage'
 import contactChannel from './contactChannel'
 import blockContent from './blockContent'
 import page from './page'
+import originHub from './originHub'
+import destinationHub from './destinationHub'
 
 export const schemaTypes = [
   // Settings & Global
@@ -20,6 +22,10 @@ export const schemaTypes = [
   // Core Business
   service,
   rateCard,
+
+  // Route Pages (UAE <-> Pakistan)
+  originHub,
+  destinationHub,
 
   // Blog & Content
   page,
